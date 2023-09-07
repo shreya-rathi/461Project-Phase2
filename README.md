@@ -3,6 +3,7 @@
 # Ethan Burmane
 # Ashwin Sreedhar
 # Jonah Nichols
+# Onyekwere Toby
 
 ## npm
 
@@ -72,3 +73,4 @@
 * 
 ### Documentation
 * REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md 
+
