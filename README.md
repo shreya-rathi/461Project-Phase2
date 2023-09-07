@@ -54,3 +54,21 @@
 
 * Memory issues: 
   * Installing a large number of dependencies or large packages can lead to memory-related errors. You can try increasing your system's available memory or use tools like npm ci for a more efficient installation process.
+
+## GitHub API
+* We will use the GitHub APIs to gather metadata for our metric calculations
+* Examples of information to gather:
+ * Length of documentation
+ * Number of contributors
+ * Average number of contributors for past x weeks
+ * 
+
+### Documentation
+* REST API: https://docs.github.com/en/rest?apiVersion=2022-11-28
+* Graph QL: https://docs.github.com/en/graphql
+
+## npm API
+* We will use the npm API for the same purpose as the GitHub API
+* 
+### Documentation
+* REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md 
