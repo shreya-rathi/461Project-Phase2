@@ -15,4 +15,5 @@ Instructions to set-up and run:
   - this starts up the CLI.
   - after this is run, you should see the CLI come up, with all the options listed.
 4. Run any of the commands: "install, test, FILE_URL"
-  - as of last update (9/6/23), you must call "./dist/run _____". "./run ____" will not work; this will be changed soon.
+  - as of last update (9/6/23), you must call "./dist/run _____".
+  - "./run ____" will not work; this will be changed soon.
