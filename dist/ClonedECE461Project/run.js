@@ -2,9 +2,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
-const install_1 = require("./commands/install");
-const urlFile_1 = require("./commands/urlFile");
-const test_1 = require("./commands/test");
+const install_1 = require("./src/commands/install");
+const urlFile_1 = require("./src/commands/urlFile");
+const test_1 = require("./src/commands/test");
 //const { Command } = require("commander");
 const figlet = require("figlet");
 //const program = new Command();
