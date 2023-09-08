@@ -1,4 +1,5 @@
 import { program } from 'commander';
+import install from './commands/install';
 // import commands from file path once created
 
 program
@@ -6,5 +7,6 @@ program
     .description('Command Line Interface for grading packages');
 
 // add commands to program
+install(program);
 
 program.parse(process.argv)

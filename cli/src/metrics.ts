@@ -3,34 +3,70 @@
 // Date: 09/07/2023
 // Author: Ethan Burmane
 // Description: This file will contain all of the functions to calculate the metrics
+// Actions: 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 import * as child_process from "child_process";
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Parameters: repo_url: string
-// Output: bus_factor: number
-// Associated: github_handler, npm_handler
-// Description: This function will calculate the bus factor of a given repository
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function bus_factor(repo_url: string) {
+class Metric {
 
-    // clone from git repo (only necessary files)
-    child_process.execSync("git clone {repo_url}");
+    constructor(private repo_url: string) {
+        this.repo_url = repo_url;
+    }
 
-    // access meta data from git repo
-    // calculate bus factor
-    // clean up (delete cloned repo)
+    cloneRepo(): void {
+        child_process.execSync("git clone {repo_url}");
+    }
+
+    deleteRepo(): void {
+
+    }
+}
+
+class BusFactor extends Metric {
+
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
 
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Parameters: repo_url: string
-// Output: 
-// Associated: 
-// Description: 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function clone_repo() {
+class License extends Metric {
+    
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
 
+}
+
+class RampUp extends Metric {
+
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
+
+}
+
+class ResponsiveMaintainer extends Metric {
+
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
+
+}
+
+class Correctness extends Metric {
+    
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
+    
+}
+
+class NetScore extends Metric {
+
+    constructor(repo_url: string) {
+        super(repo_url);
+    }
 
 }
