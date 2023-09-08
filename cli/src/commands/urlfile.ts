@@ -1,5 +1,4 @@
 import { Command } from "commander";
-import { exec } from "child_process";
 import { readFileSync } from "fs";
 
 export function urlFileCommand() {
