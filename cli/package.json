@@ -4,11 +4,11 @@
     "description": "",
     "main": "app.ts",
     "scripts": {
-      "start": "node app.js",
-      "dev": "nodemon app.js"
+      "start": "",
+      "dev": ""
     },
-    "author": "",
-    "license": "ISC",
+    "author": "Toby Onyekwere, Jonah Nichols, Ashwin Sreedhar, Andrew Kreimer, Ethan Burmane",
+    "license": "",
     "dependencies": {
       "express": "^4.17.1",
       "nodemon": "^2.0.12"
