@@ -11,6 +11,13 @@ export class NPM_api_engine
 
     }
 
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Parameters: 
+    //  param :string: package_name
+    // Output: None
+    // Associated: 
+    // Description: Makes the api call for the metadata, handling errors if any occur.
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     async get_metadata(package_name: string)
     {
         let endpoint = this.metadata_host + package_name;
