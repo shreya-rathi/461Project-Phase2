@@ -1,15 +1,9 @@
 
 import { NPM_api_engine } from "./api";
 import { Evaluator, Score} from "./evaluator";
-//URL handler for npm URLs
-//Instantiate with url
-//Parse url
-//Hit npm API for needed data
-//If no error
-//  feed data into metrics
-//  calculate overall score
-//  actually download package
-//  
+
+
+
 class NPM_handler {
 
     private api_engine: NPM_api_engine;
