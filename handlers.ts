@@ -1,6 +1,6 @@
 
 import { NPM_api_engine } from "./api";
-import { Evaluator } from "./evaluator";
+import { Evaluator, Score} from "./evaluator";
 //URL handler for npm URLs
 //Instantiate with url
 //Parse url
@@ -21,12 +21,26 @@ class NPM_handler {
         this.evaluator = new Evaluator();
     }
 
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Parameters: 
+    //  param :string: package_name
+    // Output: None
+    // Associated: 
+    // Description: This function uses the api engine to get the metadata for the given package name.
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     public async get_metadata(package_name: string)
     {
         return this.api_engine.get_metadata(package_name);
     }
 
-    public evaluate(package_name: string)
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Parameters: 
+    //  param :string: package_name
+    // Output: None
+    // Associated: 
+    // Description: Returns a Score object encapsulating the result of individual metrics and the total score.
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    public evaluate(package_name: string) : Score
     {
         const metadata = this.get_metadata(package_name);
         return this.evaluator.evaluate(package_name, metadata);
