@@ -37,6 +37,11 @@ export class Score
         return this.total;
     }
 
+    public get_metric_scores()
+    {
+        return this.metric_scores;
+    }
+
     
 }
 
@@ -64,9 +69,9 @@ export class Evaluator
     public evaluate(package_name: string, metadata: Object)
     {
         //Loop through each metric and get score
-        //for ...
         let score = new Score();
-
+        
+        //for ...
         score.add_score(this.metrics[0], this.metrics[0].score(package_name, metadata));
 
         return score;

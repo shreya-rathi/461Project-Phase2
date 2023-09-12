@@ -1,4 +1,4 @@
-
+import axios from "axios";
 
 
 
@@ -22,20 +22,21 @@ export class NPM_api_engine
     {
         let endpoint = this.metadata_host + package_name;
         try {
-            const response = await fetch(endpoint);
-        
-            if (!response.ok) {
+            const response = await axios.get(endpoint);
+
+            if (response.status == 500) {
               throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        
-            const data = await response.json();
+            
+            return response.data;
 
-            return data;
 
           } catch (error) {
             console.error('Error:', error);
           }
     }
+    
+    get_metadata_host() { return this.metadata_host; }
 }
 
 class GitHub_api_engine
