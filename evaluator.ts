@@ -72,8 +72,14 @@ export class Evaluator
         //Loop through each metric and get score
         let score = new Score();
         
-        //for ...
-        score.add_score(this.metrics[0], this.metrics[0].score(pkg));
+        //for each metric
+        //Metric.score() will take a package and do whatever it needs with the api engines available to the Metrics
+        // and will return the calculated score, normalized to be between 1 and 0.
+        for (let m = 0; m < this.metrics.length; m++)
+        {
+            score.add_score(this.metrics[m], this.metrics[m].score(pkg));
+        }
+        
         return score;
     }
     
