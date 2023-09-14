@@ -1,9 +1,10 @@
+import { Package } from "./package";
 
 export interface Metric 
 {
     name: string;
     get_name(): string;
-    score(package_name: string, metadata: Object): number;
+    score(pkg: Package): number;
 
 }
 
@@ -19,7 +20,7 @@ export class Correctness implements Metric
     // Associated: 
     // Description: Uses the available data to calculate the score for correctness
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public score(package_name: string, metadata: Object)
+    public score(pkg: Package)
     {
         return 0;
     }

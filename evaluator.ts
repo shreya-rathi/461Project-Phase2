@@ -1,6 +1,6 @@
 import { Correctness, Metric } from "./metrics";
-
-
+import { NPM_api_engine } from "./api";
+import { Package } from "./package";
 
 export class Score 
 {
@@ -48,11 +48,12 @@ export class Score
 export class Evaluator
 {
     private metrics: Array<Metric>;
+    private npm_engine: NPM_api_engine;
 
     constructor()
     {
         this.metrics = [];
-
+        this.npm_engine = new NPM_api_engine();
         //Do for each metric
         let correctness = new Correctness();
         this.metrics.push(correctness);
@@ -66,14 +67,13 @@ export class Evaluator
     // Associated: 
     // Description: 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public evaluate(package_name: string, metadata: Object)
+    public evaluate(pkg: Package)
     {
         //Loop through each metric and get score
         let score = new Score();
         
         //for ...
-        score.add_score(this.metrics[0], this.metrics[0].score(package_name, metadata));
-
+        score.add_score(this.metrics[0], this.metrics[0].score(pkg));
         return score;
     }
     
