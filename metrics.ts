@@ -1,5 +1,6 @@
 import { Package } from "./package";
 import { Package_Installer } from "./installer";
+import { execSync } from "child_process";
 
 export class Metric 
 {
