@@ -1,4 +1,4 @@
-import { Correctness, Metric } from "./metrics";
+import { Correctness, Metric, BusFactor, ResponsiveMaintainer, License, RampUp, Metric_interface } from "./metrics";
 import { NPM_api_engine } from "./api";
 import { Package } from "./package";
 
@@ -10,18 +10,20 @@ export class Score
     constructor()
     {
         this.total = NaN;
+
+        //Format {metric_name: score (0..1)}
         this.metric_scores = {};
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Parameters: 
-    //  param :Metric: metric
+    //  param :Metric_interface: metric
     //  param :number: score
     // Output: None
     // Associated: 
     // Description: Adds a metric's score to the object.
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public add_score(metric: Metric, score: number)
+    public add_score(metric: Metric_interface, score: number)
     {
         this.metric_scores[metric.get_name()] = score;
     }
@@ -47,16 +49,29 @@ export class Score
 
 export class Evaluator
 {
-    private metrics: Array<Metric>;
+    private metrics: Array<Metric_interface>;
     private npm_engine: NPM_api_engine;
 
     constructor()
     {
         this.metrics = [];
         this.npm_engine = new NPM_api_engine();
+
         //Do for each metric
         let correctness = new Correctness();
         this.metrics.push(correctness);
+
+        let bus_factor = new BusFactor();
+        this.metrics.push(bus_factor);
+
+        let responsive_maintainer = new ResponsiveMaintainer();
+        this.metrics.push(responsive_maintainer);
+
+        let license = new License();
+        this.metrics.push(license);
+
+        let ramp_up = new RampUp();
+        this.metrics.push(ramp_up);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
