@@ -31,4 +31,9 @@ export class Package_Installer
         //Try delete
         //handle error and log
     }
+
+    public install_pkg(pkg: Package)
+    {
+
+    }
 }
