@@ -1,7 +1,7 @@
 import { Package } from "./package";
 import { Package_Installer } from "./installer";
 
-class Metric 
+export class Metric 
 {
     downloader = new Package_Installer();
 
@@ -59,7 +59,7 @@ export class Correctness extends Metric implements Metric_interface
 
 }
 
-class BusFactor extends Metric implements Metric_interface {
+export class BusFactor extends Metric implements Metric_interface {
 
     name = "BUS_FACTOR_SCORE";
     constructor() {
@@ -141,20 +141,21 @@ class BusFactor extends Metric implements Metric_interface {
         return this.name;
     }
 
-    public score() : number
+    public score(pkg: Package) : number
     {
+        //This is where your calculations should go 
 
         return 0;
     }
 
 }
 
-class License extends Metric implements Metric_interface {
+export class License extends Metric implements Metric_interface {
     
     name = "LICENSE_SCORE";
 
     constructor() {
-        super(repo_url);
+        super();
     }
 
     public get_name()
@@ -162,20 +163,21 @@ class License extends Metric implements Metric_interface {
         return this.name;
     }
 
-    public score() : number
+    public score(pkg: Package) : number
     {
+        //This is where your actual calculation should go 
 
         return 0;
     }
 
 }
 
-class RampUp extends Metric implements Metric_interface {
+export class RampUp extends Metric implements Metric_interface {
 
     name = "RAMP_UP_SCORE";
 
     constructor() {
-        super(repo_url);
+        super();
     }
 
     public get_name()
@@ -183,20 +185,21 @@ class RampUp extends Metric implements Metric_interface {
         return this.name;
     }
 
-    public score() : number
+    public score(pkg: Package) : number
     {
+        //This is where your actual calculation should go 
 
         return 0;
     }
 
 }
 
-class ResponsiveMaintainer extends Metric implements Metric_interface {
+export class ResponsiveMaintainer extends Metric implements Metric_interface {
 
     name = "RESPONSIVE_MAINTAINER_SCORE";
 
     constructor() {
-        super(repo_url);
+        super();
     }
 
     public get_name()
@@ -204,8 +207,9 @@ class ResponsiveMaintainer extends Metric implements Metric_interface {
         return this.name;
     }
 
-    public score() : number
+    public score(pkg: Package) : number
     {
+        //This is where your actual calculation should go 
 
         return 0;
     }
