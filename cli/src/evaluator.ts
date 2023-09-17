@@ -1,6 +1,8 @@
+
 import { Correctness, Metric, BusFactor, ResponsiveMaintainer, License, RampUp, Metric_interface } from "./metrics";
 import { NPM_api_engine } from "./api";
 import { Package } from "./package";
+
 
 export class Score 
 {
@@ -12,6 +14,7 @@ export class Score
         this.total = NaN;
 
         //Format {metric_name: score (0..1)}
+
         this.metric_scores = {};
     }
 
@@ -43,8 +46,6 @@ export class Score
     {
         return this.metric_scores;
     }
-
-    
 }
 
 export class Evaluator
@@ -72,6 +73,7 @@ export class Evaluator
 
         let ramp_up = new RampUp();
         this.metrics.push(ramp_up);
+
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -94,7 +96,7 @@ export class Evaluator
         {
             score.add_score(this.metrics[m], this.metrics[m].score(pkg));
         }
-        
+        // Do net score 
         return score;
     }
     

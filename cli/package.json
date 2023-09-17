@@ -5,5 +5,39 @@
   "dependencies": {
     "axios": "^1.5.0",
     "axios-mock-adapter": "^1.22.0"
+  },
+  "name": "clonedece461project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/run.js",
+    "dev": "ts-node src/run.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethanburmane/ECE461Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ethanburmane/ECE461Project/issues"
+  },
+  "homepage": "https://github.com/ethanburmane/ECE461Project#readme",
+  "dependencies": {
+    "@types/commander": "^2.12.2",
+    "axios": "^1.5.0",
+    "commander": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "figlet": "^1.6.0",
+    "isomorphic-git": "^1.24.5",
+    "progress": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "@types/progress": "^2.0.5",
+    "typescript": "^5.2.2"
   }
 }

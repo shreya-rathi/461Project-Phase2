@@ -32,7 +32,7 @@ export interface Metric_interface
 
 export class Correctness extends Metric implements Metric_interface
 {
-    name = "CORRECTNESS_SCORE";
+    name = "CORRECTNESS_SCORE"
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Parameters: 
@@ -137,7 +137,27 @@ export class BusFactor extends Metric implements Metric_interface {
         return busFactor;
     }
 
-    public get_name()
+    public score(pkg: Package) : number
+    {
+        let top_commiter_perc = this.get_top_committer_perc();
+        let top_x_commiter_perc = this.get_top_x_committer_perc();
+        let number_committers = this.get_number_committers();
+
+        let func_steepness = 0.1;
+        let top_commiter_weight = 0.3;
+        let top_x_commiter_weight = 0.3;
+        let number_committers_weight = 0.4;
+
+        let top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
+        let top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
+        let number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
+
+        let bus_factor = (top_commiter_weight * top_commiter_perc_func) + (top_x_commiter_weight * top_x_commiter_perc_func) + (number_committers_weight * number_committers_func);
+
+        return bus_factor;
+    }
+
+    public get_name() : string 
     {
         return this.name;
     }
@@ -168,9 +188,20 @@ export class License extends Metric implements Metric_interface {
     {
         //This is where your actual calculation should go 
 
+    private get_top_committer_perc()
+    {
         return 0;
     }
 
+    private get_top_x_committer_perc()
+    {
+        return 0;
+    }
+
+    private get_number_committers()
+    {
+        return 0;
+    }
 }
 
 export class RampUp extends Metric implements Metric_interface {
@@ -181,7 +212,7 @@ export class RampUp extends Metric implements Metric_interface {
         super();
     }
 
-    public get_name()
+    public get_name() : string
     {
         return this.name;
     }
@@ -203,7 +234,7 @@ export class ResponsiveMaintainer extends Metric implements Metric_interface {
         super();
     }
 
-    public get_name()
+    public get_name() : string
     {
         return this.name;
     }
@@ -224,3 +255,19 @@ export class ResponsiveMaintainer extends Metric implements Metric_interface {
 
 
 }
+
+export class NetScore implements Metric_interface
+{
+    name = "NetScore";
+
+    public score(pkg: Package)
+    {
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+

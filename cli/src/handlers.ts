@@ -2,15 +2,8 @@
 import { NPM_api_engine } from "./api";
 import { Evaluator, Score} from "./evaluator";
 import { Package } from "./package";
-//URL handler for npm URLs
-//Instantiate with url
-//Parse url
-//Hit npm API for needed data
-//If no error
-//  feed data into metrics
-//  calculate overall score
-//  actually download package
-//  
+
+
 class NPM_handler {
 
     private api_engine: NPM_api_engine;
@@ -38,6 +31,7 @@ class NPM_handler {
     {
         return this.evaluator.evaluate(pkg)
     }
+
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Parameters: 
     //  param :string: package_name
@@ -49,6 +43,7 @@ class NPM_handler {
     {
         const metadata = this.get_metadata(pkg);
         return this.evaluator.evaluate(pkg);
+
     }
 }
 
