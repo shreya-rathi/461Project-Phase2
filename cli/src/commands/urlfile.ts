@@ -20,6 +20,14 @@ export function urlFileCommand() {
         console.error(`File not found: ${file}`);
         process.exit(1);
       }*/
+
+
+      //We have the file of URLs passed in through the command line
+      // let urls = get_urls(file_name); --> functionality is written in url_handler.ts
+      // let pkgs = create_packages(urls); --> to be written
+      // let scores = score_packages(pkgs); returns json with format {"url": Score} 
+      // When urlFile's action is performed it will return an object with url, Score object pairs to be processed
+      //    either by the main executable or we can have it print out the scores here.
     });
 
   return urlFile;
