@@ -1,7 +1,7 @@
 
 import { NPM_api_engine } from "./api";
 import { Evaluator, Score} from "./evaluator";
-
+import { Package } from "./package";
 
 
 class NPM_handler {
@@ -22,9 +22,14 @@ class NPM_handler {
     // Associated: 
     // Description: This function uses the api engine to get the metadata for the given package name.
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public async get_metadata(package_name: string)
+    public async get_metadata(pkg: Package)
     {
-        return this.api_engine.get_metadata(package_name);
+        return this.api_engine.get_metadata(pkg);
+    }
+
+    public score_package(pkg: Package)
+    {
+        return this.evaluator.evaluate(pkg)
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -34,18 +39,19 @@ class NPM_handler {
     // Associated: 
     // Description: Returns a Score object encapsulating the result of individual metrics and the total score.
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public evaluate(package_name: string) : Score
+    public evaluate(pkg: Package) : Score
     {
-        const metadata = this.get_metadata(package_name);
-        return this.evaluator.evaluate(package_name, metadata);
+        const metadata = this.get_metadata(pkg);
+        return this.evaluator.evaluate(pkg);
+
     }
 }
 
 let handler = new NPM_handler();
-let package_name = "safe-regex";
+let pkg = new Package("safe-regex", "npm");
 
-console.log(handler.get_metadata(package_name));
+console.log(handler.get_metadata(pkg));
 
-let score = handler.evaluate(package_name);
+let score = handler.evaluate(pkg);
 
 console.log(score.get_total());
