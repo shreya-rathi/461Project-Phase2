@@ -1,29 +1,26 @@
-import { Command } from "commander";
-import { readFileSync } from "fs";
+import { Command } from 'commander';
+//import fs from 'fs';
 
 export function urlFileCommand() {
-    const urlFilePath = new Command();
+  const urlFile = new Command('URL_FILE');
 
-    urlFilePath
-        .arguments('<filePath>')
-        .description("Parses a file of URLs and return the metrics for each URL")
-        .action((filePath) => {
-        
-            console.log("Parsing the file...");
+  urlFile
+    .arguments('<file>')
+    .description('Process a file containing a list of URLs')
+    .action((file) => {
+      console.log(`Processing URL file:`); //  ${file}
+      // Implement the logic to process the URL file here
+      /*if (fs.existsSync(file)) {
+        const urls = fs.readFileSync(file, 'utf-8').split('\n').filter(Boolean);
+        urls.forEach((url) => {
+          console.log(`Processing URL: ${url}`);
+          // Implement the logic to process each URL here
+        });
+      } else {
+        console.error(`File not found: ${file}`);
+        process.exit(1);
+      }*/
+    });
 
-            try {
-                const fileContent = readFileSync("filePath", "utf-8");
-                const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
-                
-                urls.forEach(url => { 
-                    url_handler(url);
-                })
-
-            } catch (error) {
-                console.log(error);
-                process.exit(1);
-            }
-        })
-
-    return urlFilePath;
+  return urlFile;
 }
