@@ -74,7 +74,7 @@ export class BusFactor extends Metric implements Metric_interface {
     // git shortlog -s -n : gives the number of commits per contributor in descending order
     // git rev-list --count --all : gives the total number of commits
 
-    getTopCommitterPerc(): number {
+    get_top_committer_perc(): number {
 
         let commitLog = execSync('git shortlog -s -n');
         let numberCommits = execSync('git rev-list --count --all');
@@ -88,7 +88,7 @@ export class BusFactor extends Metric implements Metric_interface {
         return(0);
     }
 
-    getXCommitterPerc(): number {
+    get_top_x_committer_perc(): number {
 
         let commitLog = execSync('git shortlog -s -n');
         let numberCommits = execSync('git rev-list --count --all');
@@ -102,7 +102,7 @@ export class BusFactor extends Metric implements Metric_interface {
         return(0);
     }
 
-    getNumberCommitters(): number {
+    get_number_committers(): number {
 
         let commitLog = execSync('git shortlog -s -n');
 
@@ -116,9 +116,9 @@ export class BusFactor extends Metric implements Metric_interface {
     calculateBusFactor(): number {
 
         // getting metric values
-        let topCommitterPerc: number = this.getTopCommitterPerc();
-        let xCommitterPerc: number = this.getXCommitterPerc();
-        let numberCommitters: number = this.getNumberCommitters();
+        let topCommitterPerc: number = this.get_top_committer_perc();
+        let xCommitterPerc: number = this.get_top_x_committer_perc();
+        let numberCommitters: number = this.get_number_committers();
 
         // setting metric weights
         let funcSteepness: number = 0.1;
@@ -162,13 +162,6 @@ export class BusFactor extends Metric implements Metric_interface {
         return this.name;
     }
 
-    public score(pkg: Package) : number
-    {
-        //This is where your calculations should go 
-
-        return 0;
-    }
-
 }
 
 export class License extends Metric implements Metric_interface {
@@ -187,6 +180,8 @@ export class License extends Metric implements Metric_interface {
     public score(pkg: Package) : number
     {
         //This is where your actual calculation should go 
+        return 0;
+    }
 
     private get_top_committer_perc()
     {
