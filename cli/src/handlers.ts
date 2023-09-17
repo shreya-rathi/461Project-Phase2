@@ -4,7 +4,7 @@ import { Evaluator, Score} from "./evaluator";
 import { Package } from "./package";
 
 
-class NPM_handler {
+export class NPM_handler {
 
     private api_engine: NPM_api_engine;
     private evaluator: Evaluator;
@@ -41,17 +41,23 @@ class NPM_handler {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     public evaluate(pkg: Package) : Score
     {
-        const metadata = this.get_metadata(pkg);
         return this.evaluator.evaluate(pkg);
-
     }
 }
 
-let handler = new NPM_handler();
-let pkg = new Package("safe-regex", "npm");
 
-console.log(handler.get_metadata(pkg));
+class GitHub_handler 
+{
+    constructor() {}
+}
 
-let score = handler.evaluate(pkg);
+//Proof of concept
+// let handler = new NPM_handler();
+// let url = "https://www.npmjs.com/package/safe-regex"
+// let pkg = new Package(url);
 
-console.log(score.get_total());
+// console.log(handler.get_metadata(pkg));
+
+// let score = handler.evaluate(pkg);
+
+// console.log(score.get_total());

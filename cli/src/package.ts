@@ -5,11 +5,14 @@ export class Package
     private name: string;
     private domain: string;
     private metadata: Object;
+    private url: string;
 
-    constructor(_name: string, _domain: string) 
-    {
-        this.name = _name;
-        this.domain = _domain;
+    constructor(_url: string) 
+    {  
+        this.url = _url;
+        //Put regex stuff here to store things like domain, pkg name, etc.
+        //this.name = match.group() ... 
+        //this.domain = match.group() ...
         this.metadata = {};
     }
 
@@ -26,5 +29,10 @@ export class Package
     public get_metadata()
     {
         return this.metadata;
+    }
+
+    public get_url()
+    {
+        return this.url;
     }
 }

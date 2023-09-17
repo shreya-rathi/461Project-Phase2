@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { Package } from '../package';
+import { NPM_handler } from "../handlers";
 //import fs from 'fs';
 
 export function urlFileCommand() {
@@ -24,14 +25,27 @@ export function urlFileCommand() {
 
 
       //We have the file of URLs passed in through the command line
-      // let urls = get_urls(file_name); --> functionality is written in url_handler.ts
-      // let pkgs = create_packages(urls); --> to be written
-      // let scores = score_packages(pkgs); returns json with format {"url": Score} 
+      let urls = get_urls(file); // --> functionality is written in url_handler.ts
+      let pkgs = create_packages(urls); 
+      let scores = score_packages(pkgs); // returns json with format {"url": Score} 
+      
       // When urlFile's action is performed it will return an object with url, Score object pairs to be processed
       //    either by the main executable or we can have it print out the scores here.
+      
+      // output_scores(scores);
+      // OR
+      // return scores;
+      
     });
 
   return urlFile;
+}
+
+function get_urls(file_name: string)
+{
+  let urls: Array<string> = []
+
+  return urls;
 }
 
 function create_packages(urls: Array<string>) : Array<Package>
@@ -48,10 +62,10 @@ function create_packages(urls: Array<string>) : Array<Package>
 
 function score_packages(pkgs : Array<Package>)
 {
-  let npm_handler = new NPM_Handler();
-  let github_handler = new GitHub_Handler();
+  let npm_handler = new NPM_handler();
 
-  let scores = {};
+  let scores: any = {};
+
   
   for (let i = 0; i < pkgs.length; i++)
   {
