@@ -35,3 +35,81 @@ export class Correctness implements Metric
         return this.name;
     }
 }
+
+export class BusFactor implements Metric
+{
+    name = "BusFactor";
+
+    public score(package_name: string, metadata: Object)
+    {
+        
+
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+
+export class ResponsiveMaintainer implements Metric
+{
+    name = "ResponsiveMaintainer";
+
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+
+export class RampUp implements Metric
+{
+    name = "RampUp";
+
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+
+export class License implements Metric
+{
+    name = "License";
+
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+
+export class NetScore implements Metric
+{
+    name = "NetScore";
+
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
+    }
+
+    public get_name() : string 
+    {
+        return this.name;
+    }
+}
+
