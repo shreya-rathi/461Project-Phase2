@@ -1,7 +1,10 @@
 name: Pull Request Labeler
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize]
+  
+  pull_request:
+    types: [labeled, unlabeled]
 
 jobs:
   triage:
@@ -9,6 +12,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+
     steps:
       - name: Check Out Code
         uses: actions/checkout@v2
