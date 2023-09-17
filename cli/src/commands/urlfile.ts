@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { Package } from '../package';
 //import fs from 'fs';
 
 export function urlFileCommand() {
@@ -32,3 +33,35 @@ export function urlFileCommand() {
 
   return urlFile;
 }
+
+function create_packages(urls: Array<string>) : Array<Package>
+{ 
+  let pkgs = [];
+  for (let i = 0; i < urls.length; i++)
+  {
+    let p = new Package(urls[i]);
+    pkgs.push(p);
+  }
+
+  return pkgs;
+}
+
+function score_packages(pkgs : Array<Package>)
+{
+  let npm_handler = new NPM_Handler();
+  let github_handler = new GitHub_Handler();
+
+  let scores = {};
+  
+  for (let i = 0; i < pkgs.length; i++)
+  {
+    if (pkgs[i].get_domain() == "npm")
+    {
+      let s = npm_handler.evaluate(pkgs[i]);
+      scores[pkgs[i].get_url()] = s;
+    }
+    else {}
+  }
+  return scores;
+}
+
