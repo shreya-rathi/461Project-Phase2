@@ -42,15 +42,44 @@ export class BusFactor implements Metric
 
     public score(package_name: string, metadata: Object)
     {
-        
+        let top_commiter_perc = this.get_top_committer_perc();
+        let top_x_commiter_perc = this.get_top_x_committer_perc();
+        let number_committers = this.get_number_committers();
 
-        return 0;
+        let func_steepness = 0.1;
+        let top_commiter_weight = 0.3;
+        let top_x_commiter_weight = 0.3;
+        let number_committers_weight = 0.4;
+
+        let top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
+        let top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
+        let number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
+
+        let bus_factor = (top_commiter_weight * top_commiter_perc_func) + (top_x_commiter_weight * top_x_commiter_perc_func) + (number_committers_weight * number_committers_func);
+
+        return bus_factor;
     }
 
     public get_name() : string 
     {
         return this.name;
     }
+
+    private get_top_committer_perc()
+    {
+        return 0;
+    }
+
+    private get_top_x_committer_perc()
+    {
+        return 0;
+    }
+
+    private get_number_committers()
+    {
+        return 0;
+    }
+
 }
 
 export class ResponsiveMaintainer implements Metric
