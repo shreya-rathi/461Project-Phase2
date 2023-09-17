@@ -1,4 +1,4 @@
-name: Pull request labeler
+name: Pull Request Labeler
 on:
   pull_request:
     types: [opened, synchronize]
@@ -10,6 +10,11 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/labeler@v4
+      - name: Check Out Code
+        uses: actions/checkout@v2
+
+      - name: Label Pull Request
+        uses: actions/labeler@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
