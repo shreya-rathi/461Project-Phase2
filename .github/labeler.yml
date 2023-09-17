@@ -1,0 +1,9 @@
+labels:
+  - name: bug
+    conditions:
+      - title: bug
+      - body: bug
+  - name: update
+    conditions:
+      - title: update
+      - body: update

@@ -1,152 +1,144 @@
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Version: 1.0
-// Date: 09/07/2023
-// Author: Ethan Burmane
-// Description: This file will contain all of the functions to calculate the metrics
-// Actions: 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-import { execSync } from "child_process";
+export interface Metric 
+{
+    name: string;
+    get_name(): string;
+    score(package_name: string, metadata: Object): number;
 
-class Metric {
+}
 
-    constructor(private repoUrl: string) {
-        this.repoUrl = repoUrl;
+export class Correctness implements Metric
+{
+    name = "Correctness";
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Parameters: 
+    //  param :string: package_name
+    //  param :Object: metadata
+    // Output: None
+    // Associated: 
+    // Description: Uses the available data to calculate the score for correctness
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
     }
 
-    cloneRepo(tempDir: string): void {
-        try {
-            execSync('git clone ${repoUrl} ${tempDir}');
-        } catch (error) { 
-            console.log(error)
-        }
-    }
-
-    deleteRepo(): void {
-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Parameters: None
+    // Output: None
+    // Associated: 
+    // Description: Gets the metric name. 
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    public get_name() : string
+    {
+        return this.name;
     }
 }
 
-class BusFactor extends Metric {
+export class BusFactor implements Metric
+{
+    name = "BusFactor";
 
-    constructor(repo_url: string) {
-        super(repo_url);
-        // clone repo
-        // calculate bus factor
-        // delete repo
+    public score(package_name: string, metadata: Object)
+    {
+        let top_commiter_perc = this.get_top_committer_perc();
+        let top_x_commiter_perc = this.get_top_x_committer_perc();
+        let number_committers = this.get_number_committers();
+
+        let func_steepness = 0.1;
+        let top_commiter_weight = 0.3;
+        let top_x_commiter_weight = 0.3;
+        let number_committers_weight = 0.4;
+
+        let top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
+        let top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
+        let number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
+
+        let bus_factor = (top_commiter_weight * top_commiter_perc_func) + (top_x_commiter_weight * top_x_commiter_perc_func) + (number_committers_weight * number_committers_func);
+
+        return bus_factor;
     }
 
-    // git shortlog -s -n : gives the number of commits per contributor in descending order
-    // git rev-list --count --all : gives the total number of commits
-
-    getTopCommitterPerc(): number {
-
-        let commitLog = execSync('git shortlog -s -n');
-        let numberCommits = execSync('git rev-list --count --all');
-
-        // parsing commit log for top commiter
-
-        // calculating top committer percentage
-
-        // returning top committer percentage
-
-        return(0);
+    public get_name() : string 
+    {
+        return this.name;
     }
 
-    getXCommitterPerc(): number {
-
-        let commitLog = execSync('git shortlog -s -n');
-        let numberCommits = execSync('git rev-list --count --all');
-
-        // parsing commit log for top x commiters
-
-        // calculating top x committer percentage
-
-        // returning top x committer percentage
-
-        return(0);
+    private get_top_committer_perc()
+    {
+        return 0;
     }
 
-    getNumberCommitters(): number {
-
-        let commitLog = execSync('git shortlog -s -n');
-
-        // parsing commit log for number of commiters
-
-        // returning number of commiters
-
-        return(0);
+    private get_top_x_committer_perc()
+    {
+        return 0;
     }
 
-    calculateBusFactor(): number {
-
-        // getting metric values
-        let topCommitterPerc: number = this.getTopCommitterPerc();
-        let xCommitterPerc: number = this.getXCommitterPerc();
-        let numberCommitters: number = this.getNumberCommitters();
-
-        // setting metric weights
-        let funcSteepness: number = 0.1;
-        let topCommitterWeight: number = 0.3;
-        let committerPercWeight: number = 0.3;
-        let numberCommittersWeight: number = 0.4;
-
-        // calculating metric values
-        let topCommitterPercFunc: number = 1 / (1 + (Math.E ** (-1 * (funcSteepness / topCommitterPerc))));
-        let xCommitterPercFunc: number = 1 / (1 + (Math.E ** (-1 * (funcSteepness / xCommitterPerc))));
-        let numberCommittersFunc: number = 1 / (1 + (Math.E ** (-1 * funcSteepness * numberCommitters)));
-
-        // calculating bus factor
-        let busFactor: number = (topCommitterWeight * topCommitterPercFunc) + (committerPercWeight * xCommitterPercFunc) + (numberCommittersWeight * numberCommittersFunc);
-
-        return busFactor;
+    private get_number_committers()
+    {
+        return 0;
     }
 
 }
 
-class License extends Metric {
-    
-    constructor(repo_url: string) {
-        super(repo_url);
+export class ResponsiveMaintainer implements Metric
+{
+    name = "ResponsiveMaintainer";
+
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
     }
 
+    public get_name() : string 
+    {
+        return this.name;
+    }
 }
 
-class RampUp extends Metric {
+export class RampUp implements Metric
+{
+    name = "RampUp";
 
-    constructor(repo_url: string) {
-        super(repo_url);
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
     }
 
+    public get_name() : string 
+    {
+        return this.name;
+    }
 }
 
-class ResponsiveMaintainer extends Metric {
+export class License implements Metric
+{
+    name = "License";
 
-    constructor(repo_url: string) {
-        super(repo_url);
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
     }
 
-    getLastCommit(): number {
-
-        let lastCommit = execSync('git log -1 --format=%ct');
-
-        return(0);
+    public get_name() : string 
+    {
+        return this.name;
     }
-
 }
 
-class Correctness extends Metric {
-    
-    constructor(repo_url: string) {
-        super(repo_url);
-    }
-    
-}
+export class NetScore implements Metric
+{
+    name = "NetScore";
 
-class NetScore extends Metric {
-
-    constructor(repo_url: string) {
-        super(repo_url);
+    public score(package_name: string, metadata: Object)
+    {
+        return 0;
     }
 
+    public get_name() : string 
+    {
+        return this.name;
+    }
 }
+
