@@ -33,8 +33,7 @@ export function urlFileCommand() {
       //    either by the main executable or we can have it print out the scores here.
       
       // output_scores(scores);
-      // OR
-      // return scores;
+
       
     });
 
@@ -77,5 +76,13 @@ function score_packages(pkgs : Array<Package>)
     else {}
   }
   return scores;
+}
+
+function output_scores(scores: Array<Score>)
+{
+  scores.forEach((s) =>
+    {
+      s.print();
+    });
 }
 
