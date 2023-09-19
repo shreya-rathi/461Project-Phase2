@@ -20,11 +20,11 @@ class Package {
     public LicenseScore: number;
     public LicenseName: string;
 
-    public BusFactorScore: number;
-    public CorrectnessScore: number;
-    public RampUpScore: number;  
-    public MaintenanceScore: number;
-    public Netscore: number; //final score
+    public BusFactorScore: number = 0;
+    public CorrectnessScore: number = 0;
+    public RampUpScore: number = 0;  
+    public MaintenanceScore: number = 0;
+    public Netscore: number = 0; //final score
 
     //Regex for github and npm
     private githubRegex: RegExp = /^https?:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/?$/;
@@ -79,8 +79,9 @@ class Package {
         //potentially put in constructor
         // put cloning here
 
-
-        await this.License(this.owner, this.repo);
+        //testing liceense fetch 
+        //await this.License(this.owner, this.repo);
+        
         console.log("Github Repository URL");
     }
 
@@ -93,10 +94,10 @@ class Package {
     //modify as needed for each metric
     private Score(){
         this.License(this.owner, this.repo);
-        this.BusFactorScore = this.Bus_Factor();
-        this.CorrectnessScore = this.Correctness(); 
-        this.RampUpScore = this.RampUp();
-        this.MaintenanceScore = this.Maintenance();
+        //this.BusFactorScore = this.Bus_Factor();
+        //this.CorrectnessScore = this.Correctness(); 
+        //this.RampUpScore = this.RampUp();
+        //this.MaintenanceScore = this.Maintenance();
         
         //temp calculation DO NOT USE IN FINAL
         this.Netscore = (this.LicenseScore + this.BusFactorScore + this.CorrectnessScore +  + this.RampUpScore + this.MaintenanceScore)/5;
@@ -154,7 +155,7 @@ class Package {
 
 async function main() {
   const IURL: string = "https://github.com/yoheinakajima/instagraph";
-  const GIT_TOKEN: string = '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';
+  const GIT_TOKEN: string = 'GIT_TOKEN';
   const test = new Package(IURL, GIT_TOKEN);
  
   //console.log(test.owner)
