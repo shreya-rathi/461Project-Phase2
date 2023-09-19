@@ -66,7 +66,7 @@ class UrlHandler {
 const githubToken = 'GIT_TOKEN';
 const urlHandler = new UrlHandler(githubToken);
 
-// Example 
+
 async function fetchData() {
   await urlHandler.Parse("https://github.com/yoheinakajima/instagraph");
   urlHandler.logGitHubRepositoryLicense(); 
