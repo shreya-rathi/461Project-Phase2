@@ -1,43 +1,40 @@
 import { Command } from 'commander';
 import { Package } from '../package';
 import { NPM_handler } from "../handlers";
-//import fs from 'fs';
+import { readFileSync } from "fs";
 
 export function urlFileCommand() {
-  const urlFile = new Command('URL_FILE');
+    const urlFilePath = new Command();
+  
+    urlFilePath
+        .arguments('<filePath>')
+        .description("Parses a file of URLs and return the metrics for each URL")
+        .action((filePath) => {
 
-  urlFile
-    .arguments('<file>')
-    .description('Process a file containing a list of URLs')
-    .action((file) => {
-      console.log(`Processing URL file:`); //  ${file}
-      // Implement the logic to process the URL file here
-      /*if (fs.existsSync(file)) {
-        const urls = fs.readFileSync(file, 'utf-8').split('\n').filter(Boolean);
-        urls.forEach((url) => {
-          console.log(`Processing URL: ${url}`);
-          // Implement the logic to process each URL here
-        });
-      } else {
-        console.error(`File not found: ${file}`);
-        process.exit(1);
-      }*/
+            try {
+                const fileContent = readFileSync("filePath", "utf-8");
+                const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
+
+                urls.forEach(url => { 
+                    url_handler(url);
+                })
+              
+              // place urls into list
+              
+               //We have the file of URLs passed in through the command line
+                let pkgs = create_packages(urls); 
+                let scores = score_packages(pkgs); // returns json with format {"url": Score} 
+              
+                    // output_scores(scores);
 
 
-      //We have the file of URLs passed in through the command line
-      let urls = get_urls(file); // --> functionality is written in url_handler.ts
-      let pkgs = create_packages(urls); 
-      let scores = score_packages(pkgs); // returns json with format {"url": Score} 
-      
-      // When urlFile's action is performed it will return an object with url, Score object pairs to be processed
-      //    either by the main executable or we can have it print out the scores here.
-      
-      // output_scores(scores);
+            } catch (error) {
+                console.log(error);
+                process.exit(1);
+            }
+        })
 
-      
-    });
-
-  return urlFile;
+    return urlFilePath;
 }
 
 function get_urls(file_name: string)
@@ -85,4 +82,3 @@ function output_scores(scores: Array<Score>)
       s.print();
     });
 }
-
