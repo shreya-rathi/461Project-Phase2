@@ -251,17 +251,40 @@ export class ResponsiveMaintainer extends Metric implements Metric_interface {
 
 }
 
-export class NetScore implements Metric_interface
-{
+export class NetScore implements Metric_interface {
     name = "NetScore";
 
-    public score(pkg: Package)
-    {
-        return 0;
+    public score(pkg: Package): number {
+        // weights for each metric based on the specified priorities
+        const weightBF = 0.1; // Bus Factor weight
+        const weightC = 0.2;  // Correctness weight
+        const weightS = 0.2;  // Security weight
+        const weightRU = 0.2; // Ramp-Up weight
+        const weightRM = 0.2; // Responsive Maintainer weight
+        const weightL = 0.1;  // License weight
+
+        // Calculate the scores for each metric 
+        const busFactorScore = BusFactor
+        const correctnessScore = 
+        const securityScore =  
+        const rampUpScore = 
+        const responsiveMaintainerScore = 
+        const licenseScore = 
+
+        // Calculate the net score as the weighted sum of metric scores
+        const netScore = (
+            weightBF * busFactorScore +
+            weightC * correctnessScore +
+            weightS * securityScore +
+            weightRU * rampUpScore +
+            weightRM * responsiveMaintainerScore +
+            weightL * licenseScore
+        );
+
+        return netScore;
     }
 
-    public get_name() : string 
-    {
+    public get_name(): string {
         return this.name;
     }
 }
