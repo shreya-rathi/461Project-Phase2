@@ -1,10 +1,10 @@
 
 import { NPM_api_engine } from "./api";
 import { Evaluator, Score} from "./evaluator";
+import { Package } from "./package";
 
 
-
-class NPM_handler {
+export class NPM_handler {
 
     private api_engine: NPM_api_engine;
     private evaluator: Evaluator;
@@ -22,9 +22,14 @@ class NPM_handler {
     // Associated: 
     // Description: This function uses the api engine to get the metadata for the given package name.
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public async get_metadata(package_name: string)
+    public async get_metadata(pkg: Package)
     {
-        return this.api_engine.get_metadata(package_name);
+        return this.api_engine.get_metadata(pkg);
+    }
+
+    public score_package(pkg: Package)
+    {
+        return this.evaluator.evaluate(pkg)
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -34,18 +39,25 @@ class NPM_handler {
     // Associated: 
     // Description: Returns a Score object encapsulating the result of individual metrics and the total score.
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    public evaluate(package_name: string) : Score
+    public evaluate(pkg: Package) : Score
     {
-        const metadata = this.get_metadata(package_name);
-        return this.evaluator.evaluate(package_name, metadata);
+        return this.evaluator.evaluate(pkg);
     }
 }
 
-let handler = new NPM_handler();
-let package_name = "safe-regex";
 
-console.log(handler.get_metadata(package_name));
+class GitHub_handler 
+{
+    constructor() {}
+}
 
-let score = handler.evaluate(package_name);
+//Proof of concept
+// let handler = new NPM_handler();
+// let url = "https://www.npmjs.com/package/safe-regex"
+// let pkg = new Package(url);
 
-console.log(score.get_total());
+// console.log(handler.get_metadata(pkg));
+
+// let score = handler.evaluate(pkg);
+
+// console.log(score.get_total());
