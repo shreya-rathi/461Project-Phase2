@@ -3,7 +3,7 @@
 import { program } from "commander";
 import { exec } from "child_process";
 import { installCommand } from './commands/install';
-import { urlFileCommand } from './commands/urlFile';
+import { urlFileCommand } from './commands/url_file';
 import { testCommand } from './commands/test';
 
 //const { Command } = require("commander");
