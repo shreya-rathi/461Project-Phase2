@@ -44,5 +44,33 @@ export class NPM_api_engine
 
 class GitHub_api_engine
 {
+  host: string = "api.github.com/";
+
+  constructor()
+  {
+
+  }
+
+  public async repo_issues(owner: string, repo_name: string)
+  {
+    try 
+    {
+      const response = await axios.get(this.host + "repos/" + owner + "/" + repo_name + "/issues");
+
+      if (response.status == 200)
+      {
+        return response.data;
+      }
+      else 
+      {
+        //Log error
+      }
+    } 
+    catch (error) 
+    {
+      //Log
+    }
+  }
+
 
 }
