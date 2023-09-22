@@ -1,3 +1,5 @@
+import { timeStamp } from "console";
+
 const pino = require("pino");
 const fs = require("fs");
 
@@ -35,3 +37,13 @@ const logger = pino({
   transports: transports,
 });
 
+//Examples
+//These function all take arguments of (message: string, addtional_data: Object{})
+
+logger.info("Here is an info log", { msg: "ex: package 'pkg' scoring complete: 'score' ", timestamp: new Date() });
+
+logger.warn("Here is a warning log", { msg: "ex: using outdated version of module", module: "x", timestamp: new Date() });
+
+logger.error("Here is a error log", { msg: "ex: api response code 500 from endpoint 'github.com' ", request: "GET github.com/example", timestamp: new Date() });
+
+logger.fatal("Here is a fatal log", { msg: "ex: dependency not available", dependency: "example_dep", timestampe: new Date() });
