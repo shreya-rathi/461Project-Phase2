@@ -11,7 +11,7 @@
 // Associated: github_handler, npm_handler
 // Description: This function will take in a url and determine the correct handler to send it to
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function url_handler(repo_url: string) {
+export function url_handler(repo_url: string) {
 
     // creating regex to match github and npm urls
     let github_regex = /^(?:https:\/\/)?(github\.com\/|git@github\.com:)([A-Za-z0-9_.-])+\/([A-Za-z0-9_.-]+)(?:\.git)?$/;
@@ -39,7 +39,7 @@ function url_handler(repo_url: string) {
 // Associated: url_handler
 // Description: This function will take in a github url
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function github_handler(repo_url: string) {
+export function github_handler(repo_url: string) {
 
     
 
@@ -51,6 +51,6 @@ function github_handler(repo_url: string) {
 // Associated: url_handler
 // Description: This function will take in a npm url
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function npm_handler(repo_url: string) {
+export function npm_handler(repo_url: string) {
 
 }
