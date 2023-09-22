@@ -21,8 +21,8 @@ program.addCommand(testCommand());
 
 program.parse(process.argv);
 
-const mv_dir = exec('mv dist/run.js dist/run');
-const executable = exec('chmod +x dist/run');
+//const mv_dir = exec('cp dist/run.js dist/run');
+//const executable = exec('chmod +x dist/run');
 //const npm_build = exec('npm run build');
 //const npm_start = exec('npm start');
 

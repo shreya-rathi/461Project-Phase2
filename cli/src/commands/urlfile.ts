@@ -1,10 +1,18 @@
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Version: 1.1
+// Date: 09/22/2023
+// Author: Ashwin Sreedhar
+// Description: CLI command for parsing user input for file URL
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 import { Command } from 'commander';
 import { Package } from '../package';
 import { NPM_handler } from "../handlers";
 import { readFileSync } from "fs";
+import { url_handler } from '../url_handler';
 
 export function urlFileCommand() {
-    const urlFilePath = new Command();
+    const urlFilePath = new Command('URL_FILE');
   
     urlFilePath
         .arguments('<filePath>')
@@ -74,7 +82,7 @@ function score_packages(pkgs : Array<Package>)
   }
   return scores;
 }
-
+/*
 function output_scores(scores: Array<Score>)
 {
   scores.forEach((s) =>
@@ -82,3 +90,4 @@ function output_scores(scores: Array<Score>)
       s.print();
     });
 }
+*/
