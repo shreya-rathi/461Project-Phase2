@@ -3,43 +3,87 @@
 # Main pipeline
 
 # Commands
-
+* The CLI commands are implemented using a module called 'commander'.
+ * Creating a command looks like:
+  *         
+ * Fill in .action with what you want to happen on call of the command.
+ *  
 ## Pipelines
 
 ### ./run install
-
+* Diagram
+* 
 ### ./run URL_FILE
+* Diagram
 
 ### ./run test
+* Diagram
 
 # Metrics
 
+## Bus Factor
+### Description
+### Formula
+
+## Correctness
+### Description
+### Formula
+
+## License
+### Description
+### Formula
+
+## Ramp Up
+### Description
+### Formula
+
+## Responsive Maintainer
+### Description
+### Formula
+
+## Net Score
+### Description
+### Formula
+
 # Logging
-
+* Logging is implemented through a convenient library, called 'pino'.
+ * The documentation for pino: 
+* Creating a logger looks like this:
+ * 
+* Our logger is configured to separate logs by level in /cli/src/logging/logs
+  
 # Tests
+* Unit tests are implemented through a library called 'jest'.
+ * Test cases have the following structure
+ *     
 
-# APIs
+# GitHub
 
-## GitHub API
-
+## The API
 ### Documentation
 * REST API: https://docs.github.com/en/rest?apiVersion=2022-11-28
 * Graph QL: https://docs.github.com/en/graphql
 
-* We will use the GitHub APIs to gather metadata for our metric calculations
-* Examples of information to gather:
- * Length of documentation
- * Number of contributors
- * Average number of contributors for past x weeks
-   
-## npm API
-* We will use the npm API for the same purpose as the GitHub API
+* We use the GitHub REST API for the following cases:
+ * Getting the top number of committers
 
-  
-### Documentation
-* REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
+## Terminal commands
+
+### Getting the top committers % of total commits
+* We implement this by ...
+
+### Getting the top x committers % of total commits
+* We implement this by ...
+
+### Getting the number of committers
+* We implement this by ...
 
 # npm
+
+## npm API
+* We will use the npm API for the same purpose as the GitHub API
+### Documentation
+* REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 
 ## npm install
 
