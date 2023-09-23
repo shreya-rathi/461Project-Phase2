@@ -24,7 +24,7 @@ logLevels.forEach((level) => {
 });
 
 // Create the Pino logger instance with the transports
-const logger = pino({
+export const logger = pino({
   levels: {
     info: 30,
     warn: 40,
