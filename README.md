@@ -1,15 +1,49 @@
-# ECE461Project
-# Andrew Kreimer
-# Ethan Burmane
-# Ashwin Sreedhar
-# Jonah Nichols
-# Onyekwere Toby
 
-## npm
 
-### npm install
+# Main pipeline
 
-#### Possible Errors
+# Commands
+
+## Pipelines
+
+### ./run install
+
+### ./run URL_FILE
+
+### ./run test
+
+# Metrics
+
+# Logging
+
+# Tests
+
+# APIs
+
+## GitHub API
+
+### Documentation
+* REST API: https://docs.github.com/en/rest?apiVersion=2022-11-28
+* Graph QL: https://docs.github.com/en/graphql
+
+* We will use the GitHub APIs to gather metadata for our metric calculations
+* Examples of information to gather:
+ * Length of documentation
+ * Number of contributors
+ * Average number of contributors for past x weeks
+   
+## npm API
+* We will use the npm API for the same purpose as the GitHub API
+
+  
+### Documentation
+* REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
+
+# npm
+
+## npm install
+
+### Possible Errors
 
 * Missing package.json file:
   * npm requires a package.json file in the project directory to resolve and install dependencies. If this file is missing, you will get an error.
@@ -56,21 +90,6 @@
 * Memory issues: 
   * Installing a large number of dependencies or large packages can lead to memory-related errors. You can try increasing your system's available memory or use tools like npm ci for a more efficient installation process.
 
-## GitHub API
-* We will use the GitHub APIs to gather metadata for our metric calculations
-* Examples of information to gather:
- * Length of documentation
- * Number of contributors
- * Average number of contributors for past x weeks
- * 
 
-### Documentation
-* REST API: https://docs.github.com/en/rest?apiVersion=2022-11-28
-* Graph QL: https://docs.github.com/en/graphql
 
-## npm API
-* We will use the npm API for the same purpose as the GitHub API
-* 
-### Documentation
-* REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md 
 
