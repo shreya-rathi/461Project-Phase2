@@ -21,7 +21,7 @@ export function installCommand() {
             const bar = new ProgressBar(':bar :percent', { total: totalPackages });
             let installedPackages = 0;
 
-            const npmInstall = exec('npm install jest chalk commander progress isomorphic-git dotenv typescript @types/node');
+            const npmInstall = exec('npm install child_process commander figlet progress isomorphic-git dotenv typescript jest chalk @types/node');
 
             if (npmInstall.stdout) {
                 npmInstall.stdout.on('data', (data) => {

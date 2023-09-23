@@ -13,8 +13,8 @@ const handlers_1 = require("../handlers");
 const fs_1 = require("fs");
 const url_handler_1 = require("../url_handler");
 function urlFileCommand() {
-    const urlFilePath = new commander_1.Command('URL_FILE');
-    urlFilePath
+    //const urlFilePath = new Command();
+    commander_1.program
         .arguments('<filePath>')
         .description("Parses a file of URLs and return the metrics for each URL")
         .action((filePath) => {
@@ -35,7 +35,8 @@ function urlFileCommand() {
             process.exit(1);
         }
     });
-    return urlFilePath;
+    commander_1.program.parse(process.argv);
+    //return urlFilePath;
 }
 exports.urlFileCommand = urlFileCommand;
 function get_urls(file_name) {

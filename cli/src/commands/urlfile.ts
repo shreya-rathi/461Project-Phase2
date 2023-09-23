@@ -5,16 +5,16 @@
 // Description: CLI command for parsing user input for file URL
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-import { Command } from 'commander';
+import { Command, program } from 'commander';
 import { Package } from '../package';
 import { NPM_handler } from "../handlers";
 import { readFileSync } from "fs";
 import { url_handler } from '../url_handler';
 
 export function urlFileCommand() {
-    const urlFilePath = new Command('URL_FILE');
+    //const urlFilePath = new Command();
   
-    urlFilePath
+    program
         .arguments('<filePath>')
         .description("Parses a file of URLs and return the metrics for each URL")
         .action((filePath) => {
@@ -33,7 +33,7 @@ export function urlFileCommand() {
                 let pkgs = create_packages(urls); 
                 let scores = score_packages(pkgs); // returns json with format {"url": Score} 
               
-                    // output_scores(scores);
+                    output_scores(scores);
 
 
             } catch (error) {
@@ -42,7 +42,8 @@ export function urlFileCommand() {
             }
         })
 
-    return urlFilePath;
+    program.parse(process.argv);
+    //return urlFilePath;
 }
 
 function get_urls(file_name: string)
@@ -52,7 +53,7 @@ function get_urls(file_name: string)
   return urls;
 }
 
-function create_packages(urls: Array<string>) : Array<Package>
+export function create_packages(urls: Array<string>) : Array<Package>
 { 
   let pkgs = [];
   for (let i = 0; i < urls.length; i++)
@@ -64,7 +65,7 @@ function create_packages(urls: Array<string>) : Array<Package>
   return pkgs;
 }
 
-function score_packages(pkgs : Array<Package>)
+export function score_packages(pkgs : Array<Package>)
 {
   let npm_handler = new NPM_handler();
 
@@ -82,12 +83,11 @@ function score_packages(pkgs : Array<Package>)
   }
   return scores;
 }
-/*
-function output_scores(scores: Array<Score>)
+
+export function output_scores(scores: Array<any>)
 {
   scores.forEach((s) =>
     {
       s.print();
     });
 }
-*/
