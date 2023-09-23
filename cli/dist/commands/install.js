@@ -1,4 +1,10 @@
 "use strict";
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Version: 1.2
+// Date: 09/22/2023
+// Author: Ashwin Sreedhar
+// Description: CLI command for installing dependencies
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.installCommand = void 0;
 const commander_1 = require("commander");
@@ -13,7 +19,7 @@ function installCommand() {
         const totalPackages = 7; // Estimate the total number of packages to be installed
         const bar = new ProgressBar(':bar :percent', { total: totalPackages });
         let installedPackages = 0;
-        const npmInstall = (0, child_process_1.exec)('npm install axios commander progress isomorphic-git dotenv typescript @types/node');
+        const npmInstall = (0, child_process_1.exec)('npm install jest chalk commander progress isomorphic-git dotenv typescript @types/node');
         if (npmInstall.stdout) {
             npmInstall.stdout.on('data', (data) => {
                 // Here you can parse the data to get more accurate progress (if possible)

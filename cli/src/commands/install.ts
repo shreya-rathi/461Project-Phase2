@@ -1,3 +1,10 @@
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Version: 1.2
+// Date: 09/22/2023
+// Author: Ashwin Sreedhar
+// Description: CLI command for installing dependencies
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 import { Command } from "commander";
 import { exec } from "child_process";
 import ProgressBar = require("progress");
@@ -14,7 +21,7 @@ export function installCommand() {
             const bar = new ProgressBar(':bar :percent', { total: totalPackages });
             let installedPackages = 0;
 
-            const npmInstall = exec('npm install axios commander progress isomorphic-git dotenv typescript @types/node');
+            const npmInstall = exec('npm install jest chalk commander progress isomorphic-git dotenv typescript @types/node');
 
             if (npmInstall.stdout) {
                 npmInstall.stdout.on('data', (data) => {
