@@ -27,14 +27,6 @@ export function urlFileCommand() {
                 })
               */
               // place urls into list
-              
-               //We have the file of URLs passed in through the command line
-                let pkgs = create_packages(urls); 
-                let scores = score_packages(pkgs); // returns json with format {"url": Score} 
-              
-                    output_scores(scores);
-
-
             } catch (error) {
                 console.log(error);
                 process.exit(1);
