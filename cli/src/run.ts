@@ -6,7 +6,8 @@ import { Package } from "./PKG";
 import { installCommand } from './commands/install';
 import { testCommand } from './commands/test';
 import { readFileSync } from "fs";
-import {create_packages, score_packages, output_scores} from './commands/urlfile';
+import { Correctness, BusFactor, License, RampUp, ResponsiveMaintainer, NetScore } from "./metrics";
+
 
 const figlet = require("figlet");
 console.log(figlet.textSync("Package Management Rating System"));
@@ -33,18 +34,40 @@ program
             const fileContent = readFileSync("filePath", "utf-8");
             const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
             // create a list of packages
-            let packages: Package[];
+            let packages: Package[] = [];
 
             urls.forEach(url => { 
                 const pckg = new Package(url, "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");
                 packages.push(pckg);
             })
 
-            let scores = score_packages(packages);
-          
-                // output_scores(scores);
+            packages.forEach(pckg => {
+                const bus_factor_score = new BusFactor();
+                const correctness_score = new Correctness();
+                const license_score = new License();
+                const ramp_up_score = new RampUp();
+                const responsiveness_score = new ResponsiveMaintainer();
+                const net_score = new NetScore();
 
+                pckg.CorrectnessScore = correctness_score.score(pckg);
+                pckg.BusFactorScore = bus_factor_score.score(pckg);
+                pckg.LicenseScore = license_score.score(pckg);
+                pckg.RampUpScore = ramp_up_score.score(pckg);
+                pckg.MaintenanceScore = responsiveness_score.score(pckg);
+                pckg.Netscore = net_score.score(pckg);
+            })
 
+            // print out the metrics for each package
+            packages.forEach(pckg => {
+                console.log(pckg.url);
+                console.log("NET_SCORE: " + pckg.Netscore);
+                console.log("LICENSE_SCORE: " + pckg.LicenseScore);
+                console.log("CORRECTNESS_SCORE: " + pckg.CorrectnessScore);
+                console.log("RAMP_UP_SCORE: " + pckg.RampUpScore);
+                console.log("RESPONSIVE_MAINTAINER_SCORE: " + pckg.MaintenanceScore);
+                console.log("BUS_FACTOR_SCORE: " + pckg.BusFactorScore);
+                console.log("NET_SCORE: " + pckg.Netscore);
+            })
         } catch (error) {
             console.log(error);
             process.exit(1);

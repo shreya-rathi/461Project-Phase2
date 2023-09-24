@@ -44,7 +44,7 @@ export function urlFileCommand() {
     program.parse(process.argv);
     //return urlFilePath;
 }
-
+/*
 function get_urls(file_name: string)
 {
   let urls: Array<string> = []
