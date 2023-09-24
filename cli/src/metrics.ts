@@ -6,82 +6,102 @@ import { get } from "http";
 import axios from "axios";
 import { logger } from "./logging/logger";
 import { time } from "console";
-import { GitHub_api_engine } from './api';
+import { GitHub_api_engine } from './PKG';
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This is the interface for the metrics. It requires each class that implements it to have a 
 // name, a get_name() function, and a score() function.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 export interface Metric {
     name: string;
     get_name(): string;
-    score(pkg: Package): number;
+    score(): number;
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//The Correctness class calculates a correctness score for a software package or repository.
-// It uses the GitHub API to fetch the counts of open and closed issues and computes a score 
-//as the ratio of closed issues to the total,
-// ensuring it falls between 0 and 1. This score measures code quality and issue resolution, 
-// with higher values indicating better correctness. //
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 export class Correctness implements Metric {
-    public githubApiEngine: GitHub_api_engine;
+    private githubToken: string; // Your GitHub API token or authentication method
 
-    constructor() {
-        this.githubApiEngine = new GitHub_api_engine();
+    constructor(githubToken: string) {
+        this.githubToken = githubToken;
     }
 
-    // Function to get the total number of open issues
     public async getOpenIssues(owner: string, repo: string): Promise<number> {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues?state=open`;
+
         try {
-            const openIssues = await this.githubApiEngine.getOpenIssues(owner, repo);
-            return openIssues.length;
+            const response = await axios.get(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${this.githubToken}`,
+                },
+            });
+
+            if (response.status === 200) {
+                return response.data.length;
+            } else {
+                throw new Error(`GitHub API returned status ${response.status}`);
+            }
         } catch (error) {
-            // Handle errors gracefully
             console.error('Error fetching open issues:', error);
-            return 0;
+            throw error;
         }
     }
 
-    // Function to get the total number of closed issues
     public async getClosedIssues(owner: string, repo: string): Promise<number> {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues?state=closed`;
+
         try {
-            const closedIssues = await this.githubApiEngine.getClosedIssues(owner, repo);
-            return closedIssues.length;
+            const response = await axios.get(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${this.githubToken}`,
+                },
+            });
+
+            if (response.status === 200) {
+                return response.data.length;
+            } else {
+                throw new Error(`GitHub API returned status ${response.status}`);
+            }
         } catch (error) {
-            // Handle errors gracefully
             console.error('Error fetching closed issues:', error);
-            return 0;
+            throw error;
         }
     }
 
     // Function to calculate correctness score based on issue ratio
-    public score(pkg: Package): number {
-        try {
-            const owner = '';
-            const repo = '';
+    public async scoreSync(): Promise<number> {
+        const owner = ''; // Replace with your owner name
+        const repo = ''; // Replace with your repository name
 
-           // Await the Promises and cast them as numbers
-           const totalOpenIssues = Number(this.getOpenIssues(owner, repo));
-           const totalClosedIssues = Number(this.getClosedIssues(owner, repo));
+        // Create promises for open and closed issues
+        const openIssuesPromise = this.getOpenIssues(owner, repo);
+        const closedIssuesPromise = this.getClosedIssues(owner, repo);
 
-            // Calculate the issue ratio
-            const issueRatio = totalClosedIssues / (totalOpenIssues + totalClosedIssues);
+        // Wait for both promises to resolve
+        const numOpenIssues = await openIssuesPromise;
+        const numClosedIssues = await closedIssuesPromise;
 
-            // Ensure issueRatio is between 0 and 1
-            const correctnessScore = Math.min(Math.max(issueRatio, 0), 1);
+        // Calculate the issue ratio
+        const issueRatio = numClosedIssues / (numOpenIssues + numClosedIssues);
 
-            // Log the result
-            console.log('Correctness score calculated:', correctnessScore);
+        // Ensure issueRatio is between 0 and 1
+        const correctnessScore = Math.min(Math.max(issueRatio, 0), 1);
 
-            return correctnessScore;
-        } catch (error) {
-            // Handle errors gracefully and return a default value if necessary
-            console.error('Error calculating correctness score:', error);
-            return 0;
-        }
+        // Log the result
+        console.log('Correctness score calculated:', correctnessScore);
+
+        return correctnessScore;
+    }
+
+    public score(): number {
+
+        return Number(this.scoreSync());
+    }
+
+    public name: string = "Correctness";
+
+    public get_name(): string {
+        return this.name;
     }
 }
 
