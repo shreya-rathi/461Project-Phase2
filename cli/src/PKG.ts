@@ -43,6 +43,8 @@ export class Package {
     //sets type, owner, repo
     //calls handler
     constructor(InputUrl: string, gitToken: string) {
+        //Log here for package creation
+        
         this.githubToken = gitToken;
         this.url = InputUrl;
         
