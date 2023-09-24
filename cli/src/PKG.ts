@@ -83,6 +83,8 @@ export class Package {
         //potentially put in constructor
         // put cloning here
         const temp_dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-temp-dir'));
+
+        //Log cloning directory
         execSync(`git clone https://github.com/${owner}/${repo}.git`, {
           cwd: temp_dir,
           stdio: 'inherit', // Redirect child process' stdio to the parent
@@ -96,6 +98,7 @@ export class Package {
     }
 
     private Delete_Repo(temp_dir: string) {
+      //Log deleting repository
       fs.rmdirSync(temp_dir, { recursive: true });
     }
 
@@ -121,6 +124,7 @@ export class Package {
         this.LicenseScore = 0;
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/license`;
         try {
+            //Log making get request
             const response = await axios.get(apiUrl, {
               headers: {
                 Authorization: `Bearer ${this.githubToken}`,
@@ -128,6 +132,7 @@ export class Package {
             });
             
             if (response.status === 200) {
+              //Log successful response
               //log(response.data);
               //console.log(response.data);
               this.data = response.data;
@@ -135,12 +140,15 @@ export class Package {
                 this.LicenseName = this.data.license.name; // Store the license
                 this.LicenseScore = 1;
               } else {
+                //Log no license found
                 this.LicenseName = 'License information not found';
               }
             } else {
+              //Log unsuccessful response
               this.LicenseName = 'GitHub API request failed with status: ' + response.status;
             }
           } catch (error: unknown) {
+            //Log error when making request
             this.LicenseName = 'Error while making the GitHub API request: ' + (error as Error).message;
           }
 
