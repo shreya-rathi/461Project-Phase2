@@ -15,7 +15,7 @@ if (fs.existsSync(filePath)) {
   console.log('The file already exists.');
 } else {
   // If the file does not exist, create it
-  fs.writeFileSync(filePath, 'Hello, world!', 'utf-8');
+  fs.writeFileSync(filePath, '', 'utf-8');
   console.log('File created successfully.');
 }
 
