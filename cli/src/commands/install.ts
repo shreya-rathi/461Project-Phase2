@@ -8,6 +8,8 @@
 import { Command } from "commander";
 import { exec } from "child_process";
 import ProgressBar = require("progress");
+import { logger } from "../logging/logger";
+
 
 export function installCommand() {
     const install = new Command('install');
@@ -18,6 +20,7 @@ export function installCommand() {
             console.log("Installing dependencies...");
 
             //Log here for starting dependency install
+            logger.debug("Starting dependency installation", {dependencies: "", timestamp: new Date()});
            
             const totalPackages = 7; // Estimate the total number of packages to be installed
             const bar = new ProgressBar(':bar :percent', { total: totalPackages });
@@ -30,6 +33,8 @@ export function installCommand() {
             if (npmInstall.stdout) {
                 npmInstall.stdout.on('data', (data) => {
                     // Here you can parse the data to get more accurate progress (if possible)
+                    logger.debug("Installed package ", {timestamp: new Date()});
+                    
                     installedPackages += 1; 
                     bar.tick();
                     if (installedPackages >= totalPackages) {
@@ -41,6 +46,7 @@ export function installCommand() {
             npmInstall.on('close', (code) => {
                 if (code !== 0) {
                     console.error(`\nInstallation process exited with code ${code}`);
+                    logger.error("Issue when installing dependency ", {dependency: "", timestamp: new Date()});
                 } else {
                     bar.update(1);
                     console.log('\nInstallation completed successfully');
