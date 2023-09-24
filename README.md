@@ -44,13 +44,18 @@
 
 ## Bus Factor
 ### Description
-* 
+* Bus factor is a measurement of the spread of maintentance across different contributers.
+  
 ### How we plan on measuring this
 * To calculate the bus factor of a module, we will clone the repository and access the git metadata. 
 * We will clone only the required files in order to minimize storage. 
 * We will access the git log (one method might be using the git shortlog command), and look at the top contributors of the repository, and what percent each of them has contributed, as well as total number of contributors.
-* 
+  
 ### Formula
+* $top_commiter_perc_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_commiter\_perc - 0.5)}};
+* $top_x_commiter_perc_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_x\_commiter\_perc - 0.5)}};
+* $number_committers_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot \text{number\_committers}}};
+
 
 ## Correctness
 ### Description
