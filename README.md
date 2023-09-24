@@ -3,11 +3,19 @@
   
 # Helper Classes
 ## Package
+* Created to represent the packages to be evaluated ans scored.
+* Holds useful information such as packge name, owner, repo location, etc.
 
+### Constructor
+* Creation of a package is simple and can be done with just a url
+```typescript
+import { Package } from "./PKG";
 
-### Description
-### Examples
-### 
+let pkg = new Package("https://www.npmjs.com/package/safe-regex");
+```
+
+* Inside of the constructor, the url is parsed and needed information is stored in the object.
+
 
 # Commands
 * The CLI commands are implemented using a module called 'commander'.
@@ -30,12 +38,15 @@
 ## Pipelines
 
 ### ./run install
+* Install dependencies
 * [Pipeline](https://lucid.app/lucidchart/60603e27-1000-4fde-86d7-63de5030052c/edit?viewport_loc=192%2C226%2C1758%2C1029%2C0_0&invitationId=inv_4baa540d-4ab1-49cd-a42c-829a2ebb3d7d) 
   
 ### ./run URL_FILE
+* Score packages from urls in provided file
 * [Pipeline](https://lucid.app/lucidchart/6f345baf-decc-4c3d-a9ac-d18beed376ce/edit?invitationId=inv_286a5e09-8e48-4c5a-b945-7fee69e5c01b)
 
 ### ./run test
+* Conduct test suite and output results
 * [Pipeline](https://lucid.app/lucidchart/f9e8e454-c43d-437d-8afe-117b59ffd18f/edit?viewport_loc=89%2C39%2C1593%2C933%2C0_0&invitationId=inv_2ccb512b-07bb-4d8a-8b5d-7089f1cea216)
 
 # Metrics
@@ -132,11 +143,10 @@
    ```
  * The options parameter can take many useful keys depending on what you want.
  * We use the following inside options:
-  * levels:
-  * formatters:
-  * transports: 
+  * level:
+    * This is a string specifying the lowest level to be logged.
+    * This is determined by the environment variable LOG_LEVEL
  * The destination parameter at least must contain a ```.write()``` method.
-* Our logger is configured to separate logs by level in /cli/src/logging/logs
   
 # Tests
 * Unit tests are implemented through a library called 'jest'.
@@ -202,8 +212,10 @@
 * REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 
 ## npm install
+* We use this command only to install the needed dependencies inside of ```./run install```
 
 ### Possible Errors
+* List of possible errors when using npm install
 
 * Missing package.json file:
   * npm requires a package.json file in the project directory to resolve and install dependencies. If this file is missing, you will get an error.
