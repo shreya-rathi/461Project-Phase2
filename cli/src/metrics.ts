@@ -1,7 +1,9 @@
-import { execSync } from "child_process";
+
+import { exec, ChildProcess } from 'child_process';
 import { Package } from './PKG';
 import { commit } from "isomorphic-git";
 import { get } from "http";
+import axios from "axios";
 import { logger } from "./logging/logger";
 import { time } from "console";
 
@@ -16,71 +18,125 @@ export interface Metric {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// This class contains the correctness metric. The correctness metric is calculated by ...
+// This class contains the correctness metric. The correctness metric is calculated by first using ESLint to analyze and lint the code files in a specified directory,
+//counting the linting errors, and then calculating a score based on these errors. 
+//Additionally, it calculates the total lines of code in the same directory using shell commands.
+//Finally, it combines the linting error count and lines of code count to compute a correctness score, 
+//which is a measure of the code's adherence to coding standards and quality.
+//The score is normalized to ensure it falls within the range of 0 to 1, 
+//and the result is logged for further analysis.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-export class Correctness extends Metric implements Metric_interface {
-    name = "CORRECTNESS_SCORE";
 
-    // Weights for the correctness components
-    wTCP = 0.3; // Weight of Top Committer Percentage
-    wCP = 0.3;  // Weight of Committer Percentage
-    wNC = 0.4;  // Weight of Number of Committers
 
-    constructor() {
-        super();
-        // You can add code here for any other necessary initialization
+class Correctness implements Metric {
+    // Function to count linting errors using ESLint
+    public async getLintErrorCount(directoryPath: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            // Use ESLint CLI to lint the code files in the specified directory.
+            const eslintCommand = `npx eslint ${directoryPath} --format json`;
+            // Start the ESLint process and handle its output
+            const eslintProcess: ChildProcess = exec(eslintCommand, (error: Error | null, stdout: string, stderr: string) => {
+                if (error) {
+                    // Handle any potential errors here.
+                    console.error('Error while linting:', error);
+                    reject(error);
+                    return;
+                }
+
+                // Parse the ESLint JSON output to count the errors.
+                try {
+                    const eslintResults = JSON.parse(stdout);
+                    const errorCount = eslintResults.reduce(
+                        (totalErrors: number, fileResult: any) => totalErrors + fileResult.errorCount,
+                        0
+                    );
+                    resolve(errorCount);
+                } catch (parseError) {
+                    console.error('Error parsing ESLint results:', parseError);
+                    reject(parseError);
+                }
+            });
+
+            // Handle the ESLint process exit event
+            eslintProcess.on('exit', (code: number) => {
+                if (code !== 0) {
+                    console.error('ESLint process exited with a non-zero status code:', code);
+                }
+            });
+        });
     }
 
-    public score(pkg: Package): number {
-        // Calculate Top Committer Percentage
-        const topCommitterPercentage: number = this.get_top_committer_perc(pkg.get_directory());
+    // Function to count total lines of code using shell commands
+    public async getTotalLinesOfCode(directoryPath: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            // Use a command to count the total lines of code in the specified directory.
+            const countLinesCommand = `find ${directoryPath} -name '*.js' -o -name '*.ts' | xargs wc -l | tail -n 1 | awk '{print $1}'`;
+            // Start a child process to execute the command and handle its output
+            const linesOfCodeProcess: ChildProcess = exec(countLinesCommand, (error: Error | null, stdout: string, stderr: string) => {
+                if (error) {
+                    // Handle any potential errors here.
+                    console.error('Error counting lines of code:', error);
+                    reject(error);
+                    return;
+                }
 
-        // Calculate Top X Committer Percentage
-        const topXCommitterPercentage: number = this.get_top_x_committer_perc(pkg.get_directory());
+                // Parse the stdout to get the total lines of code as a number.
+                try {
+                    const linesOfCode = parseInt(stdout, 10);
+                    if (!isNaN(linesOfCode)) {
+                        resolve(linesOfCode);
+                    } else {
+                        console.error('Failed to parse lines of code:', stdout);
+                        reject('Failed to parse lines of code');
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing lines of code:', parseError);
+                    reject(parseError);
+                }
+            });
 
-        // Calculate Number of Committers
-        const numberOfCommitters: number = this.get_number_committers(pkg.get_directory());
-
-        // Use the provided equation to calculate Correctness Score
-        const k = 0.1; // Function steepness
-        const t = topCommitterPercentage; // Percentage of total commits made by the top contributor
-        const p0 = 5; // Range of top contributors included
-
-        const topCommitterWeight = this.wTCP;
-        const committerPercWeight = this.wCP;
-        const numberCommittersWeight = this.wNC;
-
-        const topCommitterPercFunc = 1 / (1 + Math.exp(-k * t));
-        const topXCommitterPercFunc = 1 / (1 + Math.exp(-k * topXCommitterPercentage));
-        const numberCommittersFunc = 1 / (1 + Math.exp(-k * numberOfCommitters));
-
-        const correctnessScore =
-            (topCommitterWeight * topCommitterPercFunc) +
-            (committerPercWeight * topXCommitterPercFunc) +
-            (numberCommittersWeight * numberCommittersFunc);
-
-        return correctnessScore;
+            // Handle the linesOfCodeProcess exit event
+            linesOfCodeProcess.on('exit', (code: number) => {
+                if (code !== 0) {
+                    console.error('Lines of code counting process exited with a non-zero status code:', code);
+                }
+            });
+        });
     }
 
-    public get_name(): string {
-        return this.name;
-    }
+    // Function to calculate correctness score
+    public async score(pkg: Package): Promise<number> {
+        try {
+            // Get the count of linting errors and total lines of code
+            const lintErrors = await this.getLintErrorCount(pkg.directory);
+            const totalLinesOfCode = await this.getTotalLinesOfCode(Package);
 
-    // Implement the following functions based on your provided code
-    private get_top_committer_perc(temp_dir: string): number {
-    
-        return 0; 
-    }
+            // Calculate the correctness score based on lint errors and lines of code
+            const errorScore = lintErrors;
+            const linesOfCodeScore = totalLinesOfCode;
 
-    private get_top_x_committer_perc(temp_dir: string): number {
+            // Calculate the correctness score as error score / lines of code score
+            let correctnessScore = errorScore / linesOfCodeScore;
 
-        return 0; 
-    }
+            // Ensure correctnessScore is between 0 and 1, inclusive
+            correctnessScore = Math.min(Math.max(correctnessScore, 0), 1);
 
-    private get_number_committers(temp_dir: string): number {
-        return 0; 
+            // Log the result
+            logger.info('Correctness score calculated', {
+                msg: 'Correctness score calculated',
+                module: 'Correctness.prototype.score',
+                timestamp: new Date(),
+            });
+
+            return Math.round(correctnessScore * 10) / 10;
+        } catch (error) {
+            // Handle errors gracefully and return a default value if necessary
+            console.error('Error calculating correctness score:', error);
+            return 0;
+        }
     }
 }
+
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This class contains the bus factor metric. The bus factor metric is calculated by using git 
@@ -91,11 +147,11 @@ export class BusFactor implements Metric {
 
     name = "BUS_FACTOR_SCORE";
 
-    public get_name() : string {
+    public get_name(): string {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
+    public score(pkg: Package): number {
         const temp_dir: string = "";
 
         // setting the constants for the bus factor score
@@ -113,9 +169,9 @@ export class BusFactor implements Metric {
         const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
         const top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
         const number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
-        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func) 
-        + (top_x_commiter_weight * top_x_commiter_perc_func) 
-        + (number_committers_weight * number_committers_func);
+        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func)
+            + (top_x_commiter_weight * top_x_commiter_perc_func)
+            + (number_committers_weight * number_committers_func);
         logger.info("bus factor score calculated", {
             msg: "bus factor score calculated",
             module: "BusFactor.prototype.score",
@@ -125,15 +181,15 @@ export class BusFactor implements Metric {
     }
 
     public get_top_committer_perc(temp_dir: string): number {
-        
+
         // switching to the correct directory
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", { 
-                msg: "could not change directory to temp directory", 
-                module: "get_top_commiter_perc", 
-                timestamp: new Date() 
+            logger.error("could not change directory to temp directory", {
+                msg: "could not change directory to temp directory",
+                module: "get_top_commiter_perc",
+                timestamp: new Date()
             });
             return 0;
         }
@@ -145,9 +201,9 @@ export class BusFactor implements Metric {
             commit_count = +commit_count_output;
         } catch (error) {
             logger.error("could not retrieve number of commits", {
-                msg: "could not retrieve number of commits", 
+                msg: "could not retrieve number of commits",
                 module: "get_top_commiter_perc",
-                timestamp: new Date() 
+                timestamp: new Date()
             });
             return 0;
         }
@@ -175,10 +231,10 @@ export class BusFactor implements Metric {
         }
         const top_commits = parseInt(first_num[0], 10)
         const top_committer_perc = top_commits / commit_count;
-        logger.info("top committer percentage calculated", { 
-            msg: "top committer percentage calculated", 
-            module: "get_top_commiter_perc", 
-            timestamp: new Date() 
+        logger.info("top committer percentage calculated", {
+            msg: "top committer percentage calculated",
+            module: "get_top_commiter_perc",
+            timestamp: new Date()
         });
         return top_committer_perc;
     }
@@ -189,10 +245,10 @@ export class BusFactor implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", { 
-                msg: "could not change directory to temp directory", 
-                module: "get_top_commiter_perc", 
-                timestamp: new Date() 
+            logger.error("could not change directory to temp directory", {
+                msg: "could not change directory to temp directory",
+                module: "get_top_commiter_perc",
+                timestamp: new Date()
             });
             return 0;
         }
@@ -229,7 +285,7 @@ export class BusFactor implements Metric {
                 module: "get_top_x_commiter_perc",
                 timestamp: new Date()
             });
-            return 0; 
+            return 0;
         }
         let x = 5;
         let top_x_commits = 0;
@@ -260,10 +316,10 @@ export class BusFactor implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", { 
-                msg: "could not change directory to temp directory", 
-                module: "get_top_commiter_perc", 
-                timestamp: new Date() 
+            logger.error("could not change directory to temp directory", {
+                msg: "could not change directory to temp directory",
+                module: "get_top_commiter_perc",
+                timestamp: new Date()
             });
             return 0;
         }
@@ -295,14 +351,14 @@ export class BusFactor implements Metric {
 // This class contains the license metric. The license metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export class License implements Metric {
-    
+
     name = "LICENSE_SCORE";
 
-    public get_name() : string{
+    public get_name(): string {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
+    public score(pkg: Package): number {
         return 0;
     }
 }
@@ -314,11 +370,11 @@ export class RampUp implements Metric {
 
     name = "RAMP_UP_SCORE";
 
-    public get_name() : string {
+    public get_name(): string {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
+    public score(pkg: Package): number {
         return 0;
     }
 }
@@ -332,11 +388,11 @@ export class ResponsiveMaintainer implements Metric {
 
     name = "RESPONSIVE_MAINTAINER_SCORE";
 
-    public get_name() : string {
+    public get_name(): string {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
+    public score(pkg: Package): number {
         const temp_dir: string = "";
 
         // setting the constants for the responsive maintainer score
@@ -353,8 +409,8 @@ export class ResponsiveMaintainer implements Metric {
         // calculating the responsive maintainer score
         const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
         const commit_frequency_func = 1 / (1 + Math.exp(-function_steepness * commit_frequency));
-        const responsive_maintainer_score = (last_commit_weigth * last_commit_func) 
-        + (commit_frequency_weight * commit_frequency_func);
+        const responsive_maintainer_score = (last_commit_weigth * last_commit_func)
+            + (commit_frequency_weight * commit_frequency_func);
         logger.info("responsive maintainer score calculated", {
             msg: "responsive maintainer score calculated",
             module: "ResponsiveMaintainer.prototype.score",
@@ -369,10 +425,10 @@ export class ResponsiveMaintainer implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", { 
-                msg: "could not change directory to temp directory", 
-                module: "get_top_commiter_perc", 
-                timestamp: new Date() 
+            logger.error("could not change directory to temp directory", {
+                msg: "could not change directory to temp directory",
+                module: "get_top_commiter_perc",
+                timestamp: new Date()
             });
             return 0;
         }
@@ -422,10 +478,10 @@ export class ResponsiveMaintainer implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", { 
-                msg: "could not change directory to temp directory", 
-                module: "get_top_commiter_perc", 
-                timestamp: new Date() 
+            logger.error("could not change directory to temp directory", {
+                msg: "could not change directory to temp directory",
+                module: "get_top_commiter_perc",
+                timestamp: new Date()
             });
             return 0;
         }
@@ -468,7 +524,7 @@ export class NetScore implements Metric {
         return this.name;
     }
 
-    public score(pkg: Package) : number{
+    public score(pkg: Package): number {
         const temp_dir = "";
         const url = ""
 
@@ -485,14 +541,14 @@ export class NetScore implements Metric {
         const correctness_weight = 0.2;
         const ramp_up_weight = 0.2;
         const license_weight = 0.2;
-        
+
         // calculating the net score
-        const net_score = Math.floor((bus_factor_weight * bus_factor_score) 
-            + (responsive_maintainer_weight * responsive_maintainer_score) 
-            + (correctness_weight * correctness_score) 
-            + (ramp_up_weight * ramp_up_score) 
+        const net_score = Math.floor((bus_factor_weight * bus_factor_score)
+            + (responsive_maintainer_weight * responsive_maintainer_score)
+            + (correctness_weight * correctness_score)
+            + (ramp_up_weight * ramp_up_score)
             + (license_weight * license_score));
-        
+
         // formatting the net score as ndjson and printing it to stdout
         const score_json = [{
             "URL": url,
@@ -503,7 +559,7 @@ export class NetScore implements Metric {
             "RESPONSIVE_MAINTAINER_SCORE": responsive_maintainer_score,
             "LICENSE_SCORE": license_score
         }];
-        
+
         const ndjson_output = score_json.map((obj) => {
             return JSON.stringify(obj);
         }).join('\n');
