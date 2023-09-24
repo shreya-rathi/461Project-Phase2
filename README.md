@@ -1,7 +1,7 @@
 
 
 # Main pipeline
-* Diagram
+* [Pipeline](https://lucid.app/lucidchart/6ac65f58-b4cb-483f-9bce-8f949223347e/edit?viewport_loc=104%2C-115%2C1931%2C1131%2C0_0&invitationId=inv_59f19485-31c5-4574-ba81-0903edaed925)
   
 # Helper Classes
 ## Package
