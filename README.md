@@ -35,10 +35,10 @@
 * [Pipeline](https://lucid.app/lucidchart/60603e27-1000-4fde-86d7-63de5030052c/edit?viewport_loc=192%2C226%2C1758%2C1029%2C0_0&invitationId=inv_4baa540d-4ab1-49cd-a42c-829a2ebb3d7d) 
   
 ### ./run URL_FILE
-* Diagram
+* [Pipeline](https://lucid.app/lucidchart/6f345baf-decc-4c3d-a9ac-d18beed376ce/edit?invitationId=inv_286a5e09-8e48-4c5a-b945-7fee69e5c01b)
 
 ### ./run test
-* Diagram
+* [Pipeline](https://lucid.app/lucidchart/f9e8e454-c43d-437d-8afe-117b59ffd18f/edit?viewport_loc=89%2C39%2C1593%2C933%2C0_0&invitationId=inv_2ccb512b-07bb-4d8a-8b5d-7089f1cea216)
 
 # Metrics
 
