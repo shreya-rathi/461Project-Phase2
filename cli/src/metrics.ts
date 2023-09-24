@@ -29,7 +29,12 @@ export interface Metric {
 
 export class Correctness implements Metric {
     public githubApiEngine: GitHub_api_engine;
+    name = "CORRECTNESS_SCORE";
 
+    public get_name(): string {
+        return this.name;
+    }
+    
     constructor() {
         this.githubApiEngine = new GitHub_api_engine();
     }

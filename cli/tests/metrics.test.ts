@@ -17,7 +17,7 @@ describe("Correctness", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await correctness_score.score(pckg); 
         expect(score).toBeDefined(); // checks that score is not null
-        expect(correctness_score.name).toBe("CORRECTNESS_SCORE"); // maybe changed to correctness_score.get_name(), to use the function
+        expect(correctness_score.get_name()).toBe("CORRECTNESS_SCORE"); // maybe changed to correctness_score.get_name(), to use the function
         expect(score).toBeGreaterThan(0);  // checks that score is greater than 0
     });
 });
@@ -28,7 +28,7 @@ describe("BusFactor", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await bus_factor_score.score(pckg); 
         expect(score).toBeDefined(); 
-        expect(bus_factor_score.name).toBe("BUS_FACTOR_SCORE");
+        expect(bus_factor_score.get_name()).toBe("BUS_FACTOR_SCORE");
         expect(score).toBeGreaterThan(0);
     });
 });
@@ -39,7 +39,7 @@ describe("LicenseCompatibility", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await license_score.score(pckg);
         expect(score).toBeDefined();
-        expect(license_score.name).toBe("LICENSE_SCORE");
+        expect(license_score.get_name()).toBe("LICENSE_SCORE");
         expect(score).toBeGreaterThan(0);
     });
 });
@@ -50,7 +50,7 @@ describe("Ramp-Up", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await ramp_up_score.score(pckg);
         expect(score).toBeDefined();
-        expect(ramp_up_score.name).toBe("RAMP_UP_SCORE");
+        expect(ramp_up_score.get_name()).toBe("RAMP_UP_SCORE");
         expect(score).toBeGreaterThan(0);
     });
 });
@@ -61,7 +61,7 @@ describe("Responsiveness", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await responsiveness_score.score(pckg);
         expect(score).toBeDefined();
-        expect(responsiveness_score.name).toBe("RESPONSIVE_MAINTAINER_SCORE");
+        expect(responsiveness_score.get_name()).toBe("RESPONSIVE_MAINTAINER_SCORE");
         expect(score).toBeGreaterThan(0);
     });
 });
@@ -73,7 +73,7 @@ describe("NetScore", () => {
         const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await net_score.score(pckg);
         expect(score).toBeDefined();
-        expect(net_score.name).toBe("NET_SCORE");
+        expect(net_score.get_name()).toBe("NET_SCORE");
         expect(score).toBeGreaterThan(0);
     });
 });

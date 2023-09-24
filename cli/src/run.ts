@@ -6,7 +6,6 @@ import { Package } from "./PKG";
 import { installCommand } from './commands/install';
 import { testCommand } from './commands/test';
 import { readFileSync } from "fs";
-import {create_packages, score_packages, output_scores} from './commands/urlfile';
 
 const figlet = require("figlet");
 console.log(figlet.textSync("Package Management Rating System"));
@@ -40,10 +39,7 @@ program
                 packages.push(pckg);
             })
 
-            let scores = score_packages(packages);
-          
-                // output_scores(scores);
-
+            
 
         } catch (error) {
             console.log(error);
