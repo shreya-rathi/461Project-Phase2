@@ -5,7 +5,18 @@
 # Commands
 * The CLI commands are implemented using a module called 'commander'.
  * Creating a command looks like:
-  *         
+  * ```typescript
+    import { Command } from "commander";
+    function installCommand() {
+    const install = new Command('install');
+
+    install
+       .description("Insert your command description.")
+       .action(() => {
+         installSomething();
+         console.log("Installed!");
+    });
+    ```     
  * Fill in .action with what you want to happen on call of the command.
  *  
 ## Pipelines
