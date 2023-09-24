@@ -7,6 +7,7 @@
 
 import { Command } from 'commander';
 import { exec } from 'child_process';
+import { runCLI } from 'jest';
 //import chalk from 'chalk'; // For styling console output
 
 export function testCommand() {
@@ -14,7 +15,43 @@ export function testCommand() {
 
   test
     .description('Runs a test suite')
-    .action(() => {
+    .action(async () => {
+			const stdout_write = process.stdout.write.bind(process.stdout);
+			process.stdout.write = () => true;
+			const stderr_write = process.stderr.write.bind(process.stderr);
+			process.stderr.write = () => true;
+
+      const config = {
+				collectCoverage: true,
+				collectCoverageFrom: ["src/**/*.{js,ts}", "!**/node_modules/**"],
+				reporters: ["default"],
+				silent: true,
+				verbose: false,
+			};
+
+			const { results } = await runCLI(config as any, [process.cwd()]);
+
+			// Restore stdout and stderr
+			process.stdout.write = stdout_write;
+			process.stderr.write = stderr_write;
+
+			// Get test results and print them
+			const total_tests = results.numTotalTests;
+			const passed = results.numPassedTests;
+			const coverage = results.coverageMap
+				? results.coverageMap.getCoverageSummary().toJSON().lines.pct
+				: 0;
+
+			console.log(`Total Tests: ${total_tests}`);
+			console.log(`Passed Tests: ${passed}`);
+			console.log(`Coverage Perc.: ${coverage}%`);
+			console.log(
+				`${passed}/${total_tests} test cases passed. ${coverage}% line coverage achieved.`,
+			);
+      
+      
+      /*
+      () => {
       //const chalk = require('chalk');
       console.log('Running test suite...');//chalk.blue('Running test suite...'));
 
@@ -56,7 +93,7 @@ export function testCommand() {
           process.exit(1);
         }
       });
+      */
     });
-
   return test;
 }
