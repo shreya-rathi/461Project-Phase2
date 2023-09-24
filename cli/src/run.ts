@@ -3,7 +3,7 @@ import { Package } from "./PKG";
 import { installCommand } from './commands/install';
 import { testCommand } from './commands/test';
 import { readFileSync } from "fs";
-import { Correctness, BusFactor, License, RampUp, ResponsiveMaintainer, NetScore } from "./metrics";
+import { NetScore } from "./metrics";
 
 export function CLI() {
     const program = new Command();
@@ -40,22 +40,26 @@ export function CLI() {
                 })
 
                 packages.forEach(pckg => {
+                    /*
                     const bus_factor_score = new BusFactor();
                     const correctness_score = new Correctness();
                     const license_score = new License();
                     const ramp_up_score = new RampUp();
                     const responsiveness_score = new ResponsiveMaintainer();
+                    */
                     const net_score = new NetScore();
-
+                    /*
                     pckg.CorrectnessScore = correctness_score.score(pckg);
                     pckg.BusFactorScore = bus_factor_score.score(pckg);
                     //pckg.LicenseScore = license_score.score(pckg);
                     pckg.RampUpScore = ramp_up_score.score(pckg);
                     pckg.MaintenanceScore = responsiveness_score.score(pckg);
+                    */
                     pckg.Netscore = net_score.score(pckg);
                 })
 
                 // print out the metrics for each package
+                /*
                 packages.forEach(pckg => {
                     console.log(pckg.url);
                     console.log("NET_SCORE: " + pckg.Netscore);
@@ -66,6 +70,7 @@ export function CLI() {
                     console.log("BUS_FACTOR_SCORE: " + pckg.BusFactorScore);
                     console.log("NET_SCORE: " + pckg.Netscore);
                 })
+                */
             } catch (error) {
                 console.log(error);
                 process.exit(1);
