@@ -52,8 +52,8 @@
 * We will access the git log (one method might be using the git shortlog command), and look at the top contributors of the repository, and what percent each of them has contributed, as well as total number of contributors.
   
 ### Formula
-$$
-top\_commiter\_perc\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_commiter\_perc - 0.5)}}
+
+$ top\_commiter\_perc\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_commiter\_perc - 0.5)}} $
 top\_x\_commiter\_perc\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_x\_commiter\_perc - 0.5)}}
 number\_committers\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot \text{number\_committers}}}
 
