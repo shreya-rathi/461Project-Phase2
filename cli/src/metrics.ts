@@ -20,6 +20,13 @@ export interface Metric {
 }
 
 export class Correctness implements Metric {
+
+    public name: string = "Correctness";
+
+    public get_name(): string {
+        return this.name;
+    }
+
     private githubToken: string; // Your GitHub API token or authentication method
 
     constructor(githubToken: string) {
@@ -97,13 +104,8 @@ export class Correctness implements Metric {
 
         return Number(this.scoreSync());
     }
-
-    public name: string = "Correctness";
-
-    public get_name(): string {
-        return this.name;
-    }
 }
+
 
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
