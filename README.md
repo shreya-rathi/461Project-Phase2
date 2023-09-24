@@ -171,7 +171,7 @@
 * Getting data on issues
   * Current number opened
   * Number of closed issues
-  * 
+  * Accessing Readme file and License file
 ## Terminal commands
 
 ### Getting the top committers % of total commits
