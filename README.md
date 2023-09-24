@@ -1,5 +1,3 @@
-
-
 # Main pipeline
 * [Pipeline](https://lucid.app/lucidchart/6ac65f58-b4cb-483f-9bce-8f949223347e/edit?viewport_loc=104%2C-115%2C1931%2C1131%2C0_0&invitationId=inv_59f19485-31c5-4574-ba81-0903edaed925)
   
@@ -52,16 +50,26 @@
 * We will access the git log (one method might be using the git shortlog command), and look at the top contributors of the repository, and what percent each of them has contributed, as well as total number of contributors.
   
 ### Formula
-
-$ top\_commiter\_perc\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_commiter\_perc - 0.5)}} $
-top\_x\_commiter\_perc\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot (top\_x\_commiter\_perc - 0.5)}}
-number\_committers\_func = \frac{1}{1 + e^{-\text{func\_steepness} \cdot \text{number\_committers}}}
-
-$$
+* The code for the calculation
+* ```typescript
+  const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
+  const top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
+  const number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
+  const bus_factor_score = (top_commiter_weight * top_commiter_perc_func)
+      + (top_x_commiter_weight * top_x_commiter_perc_func)
+      + (number_committers_weight * number_committers_func);
+  ```
 
 ## Correctness
 ### Description
+* Our package manager should support packages with a high standard of correctness. Minimal errors, open issues, etc.
+  
 ### How we plan on measuring this
+* Looking at open issues we can get a good idea of the level of correctness of the desired package.
+ * Current open issues
+ * Average issues per month over the last year
+ * Number of closed issues over time.
+   
 ### Formula
 
 ## License
@@ -85,6 +93,7 @@ $$
 * We believe a good indicator for this metric is how detailed the documentation is and how much it covers.
 
 ### Formula
+ 
 
 ## Responsive Maintainer
 ### Description
@@ -94,7 +103,13 @@ $$
 * Checking committer activity we believe is a good way to determine how active the maintenance is on the package.
 * 
 ### Formula
-
+* ```typescript
+    const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
+    const commit_frequency_func = 1 / (1 + Math.exp(-function_steepness * commit_frequency));
+    const responsive_maintainer_score = (last_commit_weigth * last_commit_func)
+        + (commit_frequency_weight * commit_frequency_func);
+   ```
+  
 ## Net Score
 ### Description
 * This is a representation of the overall score of a package, according to the provided metrics.
@@ -103,8 +118,8 @@ $$
 * This will be mostly a weighted sum of the scores, normalized to be between 0 and 1.
 
 ### Formula
-* $L_sc = License Score
-* $max(0,L_sc) * (weighted sum)
+* L_sc = License Score
+* max(0,L_sc) * (weighted sum)
 
 # Logging
 * Logging is implemented through a convenient library, called 'pino'.
@@ -152,16 +167,32 @@ $$
 * We use the GitHub REST API for the following cases:
  * Getting the top number of committers
 
+### Uses
+* Getting data on issues
+  * Current number opened
+  * Number of closed issues
+  * 
 ## Terminal commands
 
 ### Getting the top committers % of total commits
-* We implement this by ...
-
+* ```Busfactor.get_top_committer_perc();```
+* Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
+ *  For
+* Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
+ *  For
+ *  
 ### Getting the top x committers % of total commits
-* We implement this by ...
+* ```Busfactor.get_top__x_committer_perc();```
+* * Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
+ *  For
+* Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
+ *  For
+
 
 ### Getting the number of committers
-* We implement this by ...
+* ```Busfactor.get_number_committers();```
+* Executes ```execSync(`git log --format='%ae' | sort -u | wc -l`);```
+ *  For
 
 # npm
 
