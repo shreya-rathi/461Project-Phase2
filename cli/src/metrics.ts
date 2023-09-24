@@ -26,7 +26,6 @@ export interface Metric {
 // with higher values indicating better correctness. //
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-
 export class Correctness implements Metric {
     public githubApiEngine: GitHub_api_engine;
 
@@ -59,14 +58,14 @@ export class Correctness implements Metric {
     }
 
     // Function to calculate correctness score based on issue ratio
-    public async score(pkg: Package): Promise<number> {
+    public score(pkg: Package): number {
         try {
-
             const owner = '';
             const repo = '';
 
-            const totalOpenIssues = await this.getOpenIssues(owner, repo);
-            const totalClosedIssues = await this.getClosedIssues(owner, repo);
+           // Await the Promises and cast them as numbers
+           const totalOpenIssues = Number(this.getOpenIssues(owner, repo));
+           const totalClosedIssues = Number(this.getClosedIssues(owner, repo));
 
             // Calculate the issue ratio
             const issueRatio = totalClosedIssues / (totalOpenIssues + totalClosedIssues);
@@ -85,9 +84,6 @@ export class Correctness implements Metric {
         }
     }
 }
-
-
-
 
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
