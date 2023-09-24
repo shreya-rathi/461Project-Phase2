@@ -32,8 +32,8 @@
 ## Pipelines
 
 ### ./run install
-* Diagram
-* 
+* [Pipeline](https://lucid.app/lucidchart/60603e27-1000-4fde-86d7-63de5030052c/edit?viewport_loc=192%2C226%2C1758%2C1029%2C0_0&invitationId=inv_4baa540d-4ab1-49cd-a42c-829a2ebb3d7d) 
+  
 ### ./run URL_FILE
 * Diagram
 
