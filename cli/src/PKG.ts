@@ -44,6 +44,7 @@ export class Package {
     //calls handler
     constructor(InputUrl: string, gitToken: string) {
         //Log here for package creation
+        logger.info(`Creating package from url: ${InputUrl}`, {timestamp: new Date()});
         
         this.githubToken = gitToken;
         this.url = InputUrl;
@@ -87,6 +88,7 @@ export class Package {
         const temp_dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-temp-dir'));
 
         //Log cloning directory
+        logger.info("Cloning repository", {repository: repo, timestamp: new Date()});
         execSync(`git clone https://github.com/${owner}/${repo}.git`, {
           cwd: temp_dir,
           stdio: 'inherit', // Redirect child process' stdio to the parent
@@ -101,6 +103,7 @@ export class Package {
 
     private Delete_Repo(temp_dir: string) {
       //Log deleting repository
+      logger.info("Deleting local repository", {timestamp: new Date()});
       fs.rmdirSync(temp_dir, { recursive: true });
     }
 
@@ -112,6 +115,7 @@ export class Package {
 
     //modify as needed for each metric
     private Score(){
+        logger.debug(`Scoring package ${this.repo}`, {repository: this.repo, timestamp: new Date()});
         this.License(this.owner, this.repo);
         this.BusFactorScore = this.Bus_Factor();
         //this.CorrectnessScore = this.Correctness(); 
