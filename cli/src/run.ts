@@ -2,14 +2,12 @@
 
 import { program } from "commander";
 import { exec } from "child_process";
+import { Package } from "./PKG";
 import { installCommand } from './commands/install';
-import { urlFileCommand } from './commands/urlfile';
 import { testCommand } from './commands/test';
-import { Package } from './package';
-import { NPM_handler } from "./handlers";
 import { readFileSync } from "fs";
-import { url_handler } from './url_handler';
 import {create_packages, score_packages, output_scores} from './commands/urlfile';
+
 const figlet = require("figlet");
 console.log(figlet.textSync("Package Management Rating System"));
 
@@ -18,24 +16,31 @@ program
     .description("CLI for package management rating system");
 
 program.addCommand(installCommand());
+
 program
     .arguments('<filePath>')
     .description("Parses a file of URLs and return the metrics for each URL")
-    .action((filePath) => {
-
+    .action(async(filePath) => {
+        type metrics = {
+            NET_SCORE: number,
+            LICENSE_SCORE: number,
+            CORRECTNESS_SCORE: number,
+            RAMP_UP_SCORE: number,
+            RESPONSIVE_MAINTAINER_SCORE: number,
+            BUS_FACTOR_SCORE: number
+        }
         try {
             const fileContent = readFileSync("filePath", "utf-8");
             const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
+            // create a list of packages
+            let packages: Package[];
 
             urls.forEach(url => { 
-                url_handler(url);
+                const pckg = new Package(url, "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");
+                packages.push(pckg);
             })
-          
-          // place urls into list
-          
-           //We have the file of URLs passed in through the command line
-            let pkgs = create_packages(urls); 
-            let scores = score_packages(pkgs); // returns json with format {"url": Score} 
+
+            let scores = score_packages(packages);
           
                 // output_scores(scores);
 

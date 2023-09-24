@@ -19,7 +19,7 @@ function installCommand() {
         const totalPackages = 7; // Estimate the total number of packages to be installed
         const bar = new ProgressBar(':bar :percent', { total: totalPackages });
         let installedPackages = 0;
-        const npmInstall = (0, child_process_1.exec)('npm install jest chalk commander progress isomorphic-git dotenv typescript @types/node');
+        const npmInstall = (0, child_process_1.exec)('npm install child_process commander figlet progress isomorphic-git dotenv typescript jest chalk @types/node');
         if (npmInstall.stdout) {
             npmInstall.stdout.on('data', (data) => {
                 // Here you can parse the data to get more accurate progress (if possible)

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.logger = void 0;
 const pino = require("pino");
 const fs = require("fs");
 //Make sure log directory exists
@@ -18,7 +19,7 @@ logLevels.forEach((level) => {
     });
 });
 // Create the Pino logger instance with the transports
-const logger = pino({
+exports.logger = pino({
     levels: {
         info: 30,
         warn: 40,
@@ -32,7 +33,7 @@ const logger = pino({
 });
 //Examples
 //These function all take arguments of (message: string, addtional_data: Object{})
-logger.info("Here is an info log", { msg: "ex: package 'pkg' scoring complete: 'score' ", timestamp: new Date() });
-logger.warn("Here is a warning log", { msg: "ex: using outdated version of module", module: "x", timestamp: new Date() });
-logger.error("Here is a error log", { msg: "ex: api response code 500 from endpoint 'github.com' ", request: "GET github.com/example", timestamp: new Date() });
-logger.fatal("Here is a fatal log", { msg: "ex: dependency not available", dependency: "example_dep", timestampe: new Date() });
+exports.logger.info("Here is an info log", { msg: "ex: package 'pkg' scoring complete: 'score' ", timestamp: new Date() });
+exports.logger.warn("Here is a warning log", { msg: "ex: using outdated version of module", module: "x", timestamp: new Date() });
+exports.logger.error("Here is a error log", { msg: "ex: api response code 500 from endpoint 'github.com' ", request: "GET github.com/example", timestamp: new Date() });
+exports.logger.fatal("Here is a fatal log", { msg: "ex: dependency not available", dependency: "example_dep", timestampe: new Date() });

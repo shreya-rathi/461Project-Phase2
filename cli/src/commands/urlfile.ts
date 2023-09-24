@@ -6,10 +6,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 import { Command, program } from 'commander';
-import { Package } from '../package';
-import { NPM_handler } from "../handlers";
+import { Package } from '../PKG';
+//import { NPM_handler } from "../handlers";
 import { readFileSync } from "fs";
-import { url_handler } from '../url_handler';
 
 export function urlFileCommand() {
     //const urlFilePath = new Command();
@@ -22,11 +21,11 @@ export function urlFileCommand() {
             try {
                 const fileContent = readFileSync("filePath", "utf-8");
                 const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
-
+/*
                 urls.forEach(url => { 
                     url_handler(url);
                 })
-              
+              */
               // place urls into list
               
                //We have the file of URLs passed in through the command line
@@ -58,7 +57,7 @@ export function create_packages(urls: Array<string>) : Array<Package>
   let pkgs = [];
   for (let i = 0; i < urls.length; i++)
   {
-    let p = new Package(urls[i]);
+    let p = new Package(urls[i], "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");
     pkgs.push(p);
   }
 
@@ -91,3 +90,4 @@ export function output_scores(scores: Array<any>)
       s.print();
     });
 }
+*/
