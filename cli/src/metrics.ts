@@ -76,6 +76,7 @@ export class BusFactor implements Metric {
         process.chdir(temp_dir);
 
         // retrieving the number of commits 
+        logger.debug("Retrieving commit data from git", {timestamp: new Date()});
         const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
         const commit_count: number = +commit_count_output;
 
@@ -96,6 +97,7 @@ export class BusFactor implements Metric {
         process.chdir(temp_dir);
 
         // retreiving the number of commits
+        logger.debug("Retrieving commit data from git", {timestamp: new Date()});
         const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
         const commit_count: number = +commit_count_output;
 
@@ -120,6 +122,7 @@ export class BusFactor implements Metric {
         process.chdir(temp_dir);
 
         // retrieving the number of committers
+        logger.debug("Retrieving number of commits data from git", {timestamp: new Date()});
         const output_buffer = execSync(`git log --format='%ae' | sort -u | wc -l`);
         const committer_count_string = parseInt(output_buffer.toString(), 10);
         const committer_count: number = +committer_count_string
@@ -187,6 +190,7 @@ export class License implements Metric {
       private async CloneReadme(url: string, GIT_TOKEN: string) {
           try {
             // Get the README file content from the GitHub API.
+            logger.info("Requesting readme from github", {timestamp: new Date(), url: url});
             const response = await axios.get(url, {
               headers: {
                 Authorization: `token ${GIT_TOKEN}`,
@@ -197,26 +201,46 @@ export class License implements Metric {
             // Return the README file content as a string.
             return response.data;
           } catch (error: any) {
-            throw new Error(error.response ? error.response.data : error.message);
+                if (error.response)
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), url: url, message: error.message, response: error.response.data});
+                    throw new Error(error.response.data);
+                }
+                else
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), url: url, message: error.message});
+                    throw new Error(error.message);
+                }
           }
       }
   
       private async fetchNpmPackageReadme(packageName: string) {
           try {
             // Get the package  content
+            logger.info("Getting readme from npm", {timestamp: new Date(), package: packageName});
             const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
             const packageData = response.data;
         
             // Check if the package data contains a README field.
             if (packageData.readme) {
-              console.log('README found for package:', packageName);
+                
+              logger.info("Found readme from npm", {timestampe: new Date(), package: packageName});
               //console.log(packageData.readme);
               return packageData.readme;
             } else {
+              logger.error("Readme not found on npm", {timestamp: new Date(), package: packageName, response
               throw new Error(`README not found for package: ${packageName}`);
             }
           } catch (error: any) {
-            throw new Error(error.response ? error.response.data : error.message);
+                if (error.response)
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), package: packageName, message: error.message, response: error.response.data});
+                }
+                else
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), package: packageName, message: error.message});
+                }
+                throw new Error(error.response ? error.response.data : error.message);
           }
         }
   
@@ -347,6 +371,7 @@ export class ResponsiveMaintainer implements Metric {
         process.chdir(temp_dir);
 
         // retrieving the date of the last commit
+        logger.debug("Getting data on last commit", {timestamp: new Date()});
         const last_commit_output = execSync('git log -1 --format=%ai', { encoding: 'utf-8' });
         const last_commit_date = last_commit_output.match(/(\d{4})-(\d{2})-(\d{2})/);
         if (last_commit_date === null) {
@@ -393,6 +418,7 @@ export class NetScore implements Metric {
     }
 
     public score(pkg: Package) : number{
+        logger.debug("Scoring package", {timestamp: new Date(), package: pkg.get_name()});
         const temp_dir = "";
         const url = ""
 
