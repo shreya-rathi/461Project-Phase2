@@ -2,6 +2,12 @@
 
 # Main pipeline
 
+#Helper Classes
+## Package
+### Description
+### Examples
+### 
+
 # Commands
 * The CLI commands are implemented using a module called 'commander'.
  * Creating a command looks like:
@@ -15,6 +21,7 @@
        .action(() => {
          installSomething();
          console.log("Installed!");
+    return install;
     });
     ```     
  * Fill in .action with what you want to happen on call of the command.
@@ -34,39 +41,96 @@
 
 ## Bus Factor
 ### Description
+* 
+### How we plan on measuring this
+* To calculate the bus factor of a module, we will clone the repository and access the git metadata. 
+* We will clone only the required files in order to minimize storage. 
+* We will access the git log (one method might be using the git shortlog command), and look at the top contributors of the repository, and what percent each of them has contributed, as well as total number of contributors.
+* 
 ### Formula
 
 ## Correctness
 ### Description
+### How we plan on measuring this
 ### Formula
 
 ## License
 ### Description
+* Only packages with specific licenses will be available for download.
+* Packages with an invalid license are given a 0 net score.
+  
+### How we plan on measuring this
+* Repositories contain license information which is parsed for a valid license.
+  
 ### Formula
+* 1: If valid license.
+* 0: Otherwise.
 
 ## Ramp Up
 ### Description
+* Modules should be easy to pickup and use.
+* Ramp Up measures this factor.
+  
+### How we plan on measuring this
+* We believe a good indicator for this metric is how detailed the documentation is and how much it covers.
+
 ### Formula
 
 ## Responsive Maintainer
 ### Description
+* Modules should be actively maintained such that bug fixes come quickly and security vulnerabilities do not remain available.
+* 
+### How we plan on measuring this
+* Checking committer activity we believe is a good way to determine how active the maintenance is on the package.
+* 
 ### Formula
 
 ## Net Score
 ### Description
+* This is a representation of the overall score of a package, according to the provided metrics.
+  
+### How we plan on measuring this
+* This will be mostly a weighted sum of the scores, normalized to be between 0 and 1.
+
 ### Formula
+* $L_sc = License Score
+* $max(0,L_sc) * (weighted sum)
 
 # Logging
 * Logging is implemented through a convenient library, called 'pino'.
- * The documentation for pino: 
+ * The documentation for pino: https://github.com/pinojs/pino/tree/master/docs 
 * Creating a logger looks like this:
- * 
+ * ```typescript
+   const pino = require('pino');
+   
+   const logger = pino(options, destination);
+   ```
+ * The options parameter can take many useful keys depending on what you want.
+ * We use the following inside options:
+  * levels:
+  * formatters:
+  * transports: 
+ * The destination parameter at least must contain a ```.write()``` method.
 * Our logger is configured to separate logs by level in /cli/src/logging/logs
   
 # Tests
 * Unit tests are implemented through a library called 'jest'.
  * Test cases have the following structure
- *     
+  * ```typescript
+    import { describe, it, expect } from "@jest/globals";
+
+    describe("Testing Package object", () =>
+    {
+      //A singular test under this group
+      it("Is expected to return the name", () =>
+      {
+        let pkg = new Package("https://www.npmjs.com/package/karma");
+        expect(pkg.get_name()).toBe("karma");
+      });
+
+     //Do more tests for the package object
+    });
+    ```
 
 # GitHub
 
