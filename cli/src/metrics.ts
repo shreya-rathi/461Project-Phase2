@@ -1,12 +1,13 @@
-
-import { exec, ChildProcess } from 'child_process';
+import { Package_Installer } from "./installer";
+import { execSync } from "child_process";
 import { Package } from './PKG';
 import { commit } from "isomorphic-git";
 import { get } from "http";
 import axios from "axios";
-import { logger } from "./logging/logger";
-import { time } from "console";
-import { GitHub_api_engine } from './api';
+import * as nodegit from "nodegit";
+import * as fs from "fs";
+import * as path from "path";
+
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This is the interface for the metrics. It requires each class that implements it to have a 
@@ -15,80 +16,24 @@ import { GitHub_api_engine } from './api';
 export interface Metric {
     name: string;
     get_name(): string;
-    score(pkg: Package): number;
+    score(pkg: Package): any;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//The Correctness class calculates a correctness score for a software package or repository.
-// It uses the GitHub API to fetch the counts of open and closed issues and computes a score 
-//as the ratio of closed issues to the total,
-// ensuring it falls between 0 and 1. This score measures code quality and issue resolution, 
-// with higher values indicating better correctness. //
+// This class contains the correctness metric. The correctness metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export class Correctness implements Metric
+{
+    name = "CORRECTNESS_SCORE"
 
-
-export class Correctness implements Metric {
-    public githubApiEngine: GitHub_api_engine;
-
-    constructor() {
-        this.githubApiEngine = new GitHub_api_engine();
+    public get_name() : string {
+        return this.name;
     }
 
-    // Function to get the total number of open issues
-    public async getOpenIssues(owner: string, repo: string): Promise<number> {
-        try {
-            const openIssues = await this.githubApiEngine.getOpenIssues(owner, repo);
-            return openIssues.length;
-        } catch (error) {
-            // Handle errors gracefully
-            console.error('Error fetching open issues:', error);
-            return 0;
-        }
-    }
-
-    // Function to get the total number of closed issues
-    public async getClosedIssues(owner: string, repo: string): Promise<number> {
-        try {
-            const closedIssues = await this.githubApiEngine.getClosedIssues(owner, repo);
-            return closedIssues.length;
-        } catch (error) {
-            // Handle errors gracefully
-            console.error('Error fetching closed issues:', error);
-            return 0;
-        }
-    }
-
-    // Function to calculate correctness score based on issue ratio
-    public async score(pkg: Package): Promise<number> {
-        try {
-
-            const owner = '';
-            const repo = '';
-
-            const totalOpenIssues = await this.getOpenIssues(owner, repo);
-            const totalClosedIssues = await this.getClosedIssues(owner, repo);
-
-            // Calculate the issue ratio
-            const issueRatio = totalClosedIssues / (totalOpenIssues + totalClosedIssues);
-
-            // Ensure issueRatio is between 0 and 1
-            const correctnessScore = Math.min(Math.max(issueRatio, 0), 1);
-
-            // Log the result
-            console.log('Correctness score calculated:', correctnessScore);
-
-            return correctnessScore;
-        } catch (error) {
-            // Handle errors gracefully and return a default value if necessary
-            console.error('Error calculating correctness score:', error);
-            return 0;
-        }
+    public score(pkg: Package) : number {
+        return 0;
     }
 }
-
-
-
-
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This class contains the bus factor metric. The bus factor metric is calculated by using git 
@@ -99,11 +44,11 @@ export class BusFactor implements Metric {
 
     name = "BUS_FACTOR_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         const temp_dir: string = "";
 
         // setting the constants for the bus factor score
@@ -121,180 +66,63 @@ export class BusFactor implements Metric {
         const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
         const top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
         const number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
-        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func)
-            + (top_x_commiter_weight * top_x_commiter_perc_func)
-            + (number_committers_weight * number_committers_func);
-        logger.info("bus factor score calculated", {
-            msg: "bus factor score calculated",
-            module: "BusFactor.prototype.score",
-            timestamp: new Date()
-        });
+        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func) + (top_x_commiter_weight * top_x_commiter_perc_func) + (number_committers_weight * number_committers_func);
         return bus_factor_score;
     }
 
     public get_top_committer_perc(temp_dir: string): number {
-
+        
         // switching to the correct directory
-        try {
-            process.chdir(temp_dir);
-        } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        process.chdir(temp_dir);
 
         // retrieving the number of commits 
-        let commit_count: number;
-        try {
-            const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
-            commit_count = +commit_count_output;
-        } catch (error) {
-            logger.error("could not retrieve number of commits", {
-                msg: "could not retrieve number of commits",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
+        const commit_count: number = +commit_count_output;
 
         // retrieving the number of commits from the top committer and calculating the percentage
-        let commit_list_output: string;
-        try {
-            commit_list_output = execSync('git shortlog -s -n', { encoding: 'utf-8' });
-        } catch (error) {
-            logger.error("could not retrieve number of commits from top committer", {
-                msg: "could not retrieve number of commits from top committer",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const commit_list_output = execSync('git shortlog -s -n', { encoding: 'utf-8' });
         const first_num = commit_list_output.match(/\d+/);
         if (first_num === null) {
-            logger.error("could not retrieve number of commits from top committer", {
-                msg: "could not retrieve number of commits from top committer",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
+            return 0; // error goes here
         }
         const top_commits = parseInt(first_num[0], 10)
         const top_committer_perc = top_commits / commit_count;
-        logger.info("top committer percentage calculated", {
-            msg: "top committer percentage calculated",
-            module: "get_top_commiter_perc",
-            timestamp: new Date()
-        });
         return top_committer_perc;
     }
 
     public get_top_x_committer_perc(temp_dir: string): number {
 
         // switching to the correct directory
-        try {
-            process.chdir(temp_dir);
-        } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        process.chdir(temp_dir);
 
         // retreiving the number of commits
-        let commit_count: number;
-        try {
-            const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
-            commit_count = +commit_count_output;
-        } catch (error) {
-            logger.error("could not retrieve number of commits", {
-                msg: "could not retrieve number of commits",
-                module: "get_top_x_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const commit_count_output = execSync(`git rev-list --count --all`, { encoding: 'utf-8' });
+        const commit_count: number = +commit_count_output;
+
         // retreiving the number of commits from the top x committers and calculating the percentage
-        let commit_list_output: string;
-        try {
-            commit_list_output = execSync('git shortlog -s -n', { encoding: 'utf-8' });
-        } catch (error) {
-            logger.error("could not retrieve number of commits from top x committers", {
-                msg: "could not retrieve number of commits from top x committers",
-                module: "get_top_x_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const commit_list_output = execSync('git shortlog -s -n', { encoding: 'utf-8' });
         const first_num = commit_list_output.match(/\d+/);
         if (first_num === null) {
-            logger.error("could not retrieve number of commits from top x committers", {
-                msg: "could not retrieve number of commits from top x committers",
-                module: "get_top_x_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
+            return 0; // error goes here
         }
         let x = 5;
         let top_x_commits = 0;
-        try {
-            for (let i = 0; i < x; i++) {
-                top_x_commits += parseInt(first_num[i], 10);
-            }
-        } catch (error) {
-            logger.error("x was greater than the number of commits", {
-                msg: "x was greater than the number of commits",
-                module: "get_top_x_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
+        for (let i = 0; i < x; i++) {
+            top_x_commits += parseInt(first_num[i], 10);
         }
         const top_x_committer_perc = top_x_commits / commit_count;
-        logger.info("top x committer percentage calculated", {
-            msg: "top x committer percentage calculated",
-            module: "get_top_x_commiter_perc",
-            timestamp: new Date()
-        });
         return top_x_committer_perc;
     }
 
     public get_number_committers(temp_dir: string): number {
 
         // switching to the correct directory
-        try {
-            process.chdir(temp_dir);
-        } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        process.chdir(temp_dir);
 
         // retrieving the number of committers
-        let output_buffer: string;
-        try {
-            output_buffer = execSync(`git log --format='%ae' | sort -u | wc -l`, { encoding: 'utf-8' });
-        } catch (error) {
-            logger.error("could not retrieve number of committers", {
-                msg: "could not retrieve number of committers",
-                module: "get_number_committers",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const output_buffer = execSync(`git log --format='%ae' | sort -u | wc -l`);
         const committer_count_string = parseInt(output_buffer.toString(), 10);
         const committer_count: number = +committer_count_string
-        logger.info("number of committers calculated", {
-            msg: "number of committers calculated",
-            module: "get_number_committers",
-            timestamp: new Date()
-        });
         return committer_count;
     }
 }
@@ -303,15 +131,163 @@ export class BusFactor implements Metric {
 // This class contains the license metric. The license metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export class License implements Metric {
-
+    
     name = "LICENSE_SCORE";
 
-    public get_name(): string {
+    public get_name() : string{
         return this.name;
     }
 
-    public score(pkg: Package): number {
-        return 0;
+    public async score(pkg: Package) : Promise<number> {
+        const Lscore = await this.License(pkg);
+        return (Lscore);
+    }
+
+    private FindMatch(fileContents: string): string[] {
+        const licensePatterns: string[] = [
+          'LGPLv2[. ]1',
+          'GPLv2',
+          'GPLv3',
+          'MIT',
+          'BSD',
+          'Apache',
+          'Expat',
+          'zlib',
+          'ISC',
+        ];
+        
+      
+        // Create a set to store found licenses
+        const foundLicenses: Set<string> = new Set<string>();
+      
+        // Generate regex patterns for each license
+        const regexPatterns: RegExp[] = licensePatterns.map((pattern) => {
+          // Escape any special characters in the pattern
+          const escapedPattern = pattern.replace(/[.*+?^${}()-|[\]\\]/g, '\\$&');
+          return new RegExp(`[^\\w\\d]${escapedPattern}[^\\w\\d]`, 'i');
+        });
+      
+        // Find matches using the generated regex patterns
+        for (const regex of regexPatterns) {
+          const matches = fileContents.match(regex);
+          if (matches) {
+            for (const match of matches) {
+              // Clean up the match by removing surrounding non-alphanumeric characters
+              const cleanedMatch = match.replace(/[^a-zA-Z0-9]+/g, '');
+              //console.log('Pattern Matched:', match);
+              foundLicenses.add(cleanedMatch);
+            }
+          }
+        }
+      
+        // Convert the set to an array and return it
+        return Array.from(foundLicenses);
+      }
+  
+      private async CloneReadme(url: string, GIT_TOKEN: string) {
+          try {
+            // Get the README file content from the GitHub API.
+            const response = await axios.get(url, {
+              headers: {
+                Authorization: `token ${GIT_TOKEN}`,
+                Accept: 'application/vnd.github.VERSION.raw', // Use the raw content type
+              },
+            });
+        
+            // Return the README file content as a string.
+            return response.data;
+          } catch (error: any) {
+            throw new Error(error.response ? error.response.data : error.message);
+          }
+      }
+  
+      private async fetchNpmPackageReadme(packageName: string) {
+          try {
+            // Get the package  content
+            const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+            const packageData = response.data;
+        
+            // Check if the package data contains a README field.
+            if (packageData.readme) {
+              console.log('README found for package:', packageName);
+              //console.log(packageData.readme);
+              return packageData.readme;
+            } else {
+              throw new Error(`README not found for package: ${packageName}`);
+            }
+          } catch (error: any) {
+            throw new Error(error.response ? error.response.data : error.message);
+          }
+        }
+  
+        private async  fetchNpmLicense(packageName: string) {
+          try {
+            // Get the package content
+            const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+            const packageData = response.data;
+        
+            // Check if the package data contains a license field.
+            if (packageData.license) {
+              console.log('license file found for package:', packageName);
+              //console.log(packageData.readme);
+              return packageData.license;
+            } else {
+              throw new Error(`License file not found for package: ${packageName}`);
+            }
+          } catch (error: any) {
+            throw new Error(error.response ? error.response.data : error.message);
+          }
+        }
+  
+      public async License(pkg: Package): Promise<number> {
+        //loading package information
+        let type: string = pkg.type;
+        let owner: string = pkg.owner;
+        let repo: string = pkg.repo;
+        let GIT_TOKEN  = pkg.githubToken;
+        //defiing variables
+        let UrlRepo: string = ''; 
+        let readmeContent: string = '';
+        let LContent: string = '';
+
+        //checking if the type is github or npm and calling the appropriate function
+        if (type == "github.com") {  
+          //formating the url for the github api
+          UrlRepo = `https://github.com/${owner}/${repo}`;
+          readmeContent = await this.CloneReadme(UrlRepo, GIT_TOKEN);
+          console.log(UrlRepo);
+        }else if (type == "npmjs.com") {
+          console.log("NPM called");
+          //npm version is called with repo name, url is made in function
+          readmeContent = await this.fetchNpmPackageReadme(repo)
+          //many npm repos dont put the license in the readme but in a seperate file
+          LContent = await this.fetchNpmLicense(repo);
+          console.log(UrlRepo);
+        }
+        else {
+          console.log("Invalid URL");
+          pkg.LicenseName = "Invalid URL";
+          pkg.LicenseScore = 0;
+        }
+        
+        //call the find match function to find the license match
+        const RD_Match = this.FindMatch(readmeContent);
+        
+        //check if the license was found in the readme
+        if (RD_Match && RD_Match.length > 0) {
+          pkg.LicenseName = RD_Match[0];
+          pkg.LicenseScore = 1;
+          }
+          else {
+            //if the license was not found in the readme check if it was found in the license file
+              const L_Match = this.FindMatch(LContent);
+              if (L_Match && L_Match.length > 0) {
+                  console.log('License found: ' + L_Match[0]);
+                  pkg.LicenseName = L_Match[0];
+                  pkg.LicenseScore = 1;
+              }
+          }
+        return pkg.LicenseScore
     }
 }
 
@@ -322,11 +298,11 @@ export class RampUp implements Metric {
 
     name = "RAMP_UP_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         return 0;
     }
 }
@@ -340,11 +316,11 @@ export class ResponsiveMaintainer implements Metric {
 
     name = "RESPONSIVE_MAINTAINER_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         const temp_dir: string = "";
 
         // setting the constants for the responsive maintainer score
@@ -361,51 +337,20 @@ export class ResponsiveMaintainer implements Metric {
         // calculating the responsive maintainer score
         const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
         const commit_frequency_func = 1 / (1 + Math.exp(-function_steepness * commit_frequency));
-        const responsive_maintainer_score = (last_commit_weigth * last_commit_func)
-            + (commit_frequency_weight * commit_frequency_func);
-        logger.info("responsive maintainer score calculated", {
-            msg: "responsive maintainer score calculated",
-            module: "ResponsiveMaintainer.prototype.score",
-            timestamp: new Date()
-        });
+        const responsive_maintainer_score = (last_commit_weigth * last_commit_func) + (commit_frequency_weight * commit_frequency_func);
         return responsive_maintainer_score;
     }
 
     public get_last_commit(temp_dir: string): number {
 
         // switching to the correct directory
-        try {
-            process.chdir(temp_dir);
-        } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        process.chdir(temp_dir);
 
         // retrieving the date of the last commit
-        let last_commit_output: string;
-        try {
-            last_commit_output = execSync('git log -1 --format=%ai', { encoding: 'utf-8' });
-
-        } catch (error) {
-            logger.error("could not retrieve date of last commit", {
-                msg: "could not retrieve date of last commit",
-                module: "get_last_commit",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const last_commit_output = execSync('git log -1 --format=%ai', { encoding: 'utf-8' });
         const last_commit_date = last_commit_output.match(/(\d{4})-(\d{2})-(\d{2})/);
         if (last_commit_date === null) {
-            logger.error("could not retrieve date of last commit", {
-                msg: "could not retrieve date of last commit",
-                module: "get_last_commit",
-                timestamp: new Date()
-            });
-            return 0;
+            return 0; // error goes here
         }
         const last_commit_year = parseInt(last_commit_date[1], 10);
         const last_commit_month = parseInt(last_commit_date[2], 10);
@@ -416,49 +361,20 @@ export class ResponsiveMaintainer implements Metric {
         const lastCommitDate = new Date(last_commit_year, last_commit_month - 1, last_commit_day);
         const time_difference = today.getTime() - lastCommitDate.getTime();
         const last_commit = Math.floor(time_difference / (1000 * 3600 * 24));
-        logger.info("number of days since last commit calculated", {
-            msg: "number of days since last commit calculated",
-            module: "get_last_commit",
-            timestamp: new Date()
-        });
         return last_commit;
     }
 
     public get_commit_frequency(temp_dir: string): number {
 
         // switching to the correct directory
-        try {
-            process.chdir(temp_dir);
-        } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        process.chdir(temp_dir);
 
         // getting the number of commits in the last thirty days
         const thirty_days = new Date();
         thirty_days.setDate(thirty_days.getDate() - 30);
         const formatted_date = thirty_days.toISOString().split('T')[0];
-        let commit_frequency_output: string;
-        try {
-            commit_frequency_output = execSync(`git rev-list --count --since="${formatted_date}" HEAD`, { encoding: 'utf-8' });
-        } catch (error) {
-            logger.error("could not retrieve number of commits in the last thirty days", {
-                msg: "could not retrieve number of commits in the last thirty days",
-                module: "get_commit_frequency",
-                timestamp: new Date()
-            });
-            return 0;
-        }
+        const commit_frequency_output = execSync(`git rev-list --count --since="${formatted_date}" HEAD`, { encoding: 'utf-8' });
         const commit_frequency: number = +commit_frequency_output;
-        logger.info("number of commits in the last thirty days calculated", {
-            msg: "number of commits in the last thirty days calculated",
-            module: "get_commit_frequency",
-            timestamp: new Date()
-        });
         return commit_frequency;
     }
 }
@@ -476,7 +392,7 @@ export class NetScore implements Metric {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number{
         const temp_dir = "";
         const url = ""
 
@@ -493,14 +409,14 @@ export class NetScore implements Metric {
         const correctness_weight = 0.2;
         const ramp_up_weight = 0.2;
         const license_weight = 0.2;
-
+        
         // calculating the net score
-        const net_score = Math.floor((bus_factor_weight * bus_factor_score)
-            + (responsive_maintainer_weight * responsive_maintainer_score)
-            + (correctness_weight * correctness_score)
-            + (ramp_up_weight * ramp_up_score)
+        const net_score = Math.floor((bus_factor_weight * bus_factor_score) 
+            + (responsive_maintainer_weight * responsive_maintainer_score) 
+            + (correctness_weight * correctness_score) 
+            + (ramp_up_weight * ramp_up_score) 
             + (license_weight * license_score));
-
+        
         // formatting the net score as ndjson and printing it to stdout
         const score_json = [{
             "URL": url,
@@ -511,16 +427,10 @@ export class NetScore implements Metric {
             "RESPONSIVE_MAINTAINER_SCORE": responsive_maintainer_score,
             "LICENSE_SCORE": license_score
         }];
-
         const ndjson_output = score_json.map((obj) => {
             return JSON.stringify(obj);
         }).join('\n');
         process.stdout.write(ndjson_output);
-        logger.info("net score calculated", {
-            msg: "net score calculated",
-            module: "NetScore.prototype.score",
-            timestamp: new Date()
-        });
         return net_score;
     }
 }
