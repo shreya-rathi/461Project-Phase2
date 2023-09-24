@@ -8,7 +8,7 @@ import * as path from 'path';
 export class Package {
 
     //INPUTS
-    private githubToken: string;
+    public githubToken: string;
     public url: string;
 
     //parsed url
