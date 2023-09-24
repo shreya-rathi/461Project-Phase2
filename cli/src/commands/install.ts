@@ -17,12 +17,16 @@ export function installCommand() {
        .action(() => {
             console.log("Installing dependencies...");
 
+            //Log here for starting dependency install
+           
             const totalPackages = 7; // Estimate the total number of packages to be installed
             const bar = new ProgressBar(':bar :percent', { total: totalPackages });
             let installedPackages = 0;
 
             const npmInstall = exec('npm install child_process commander figlet progress isomorphic-git dotenv typescript jest chalk @types/node');
 
+            //Log below success/failure of install
+           
             if (npmInstall.stdout) {
                 npmInstall.stdout.on('data', (data) => {
                     // Here you can parse the data to get more accurate progress (if possible)
