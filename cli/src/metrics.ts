@@ -18,16 +18,67 @@ export interface Metric {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This class contains the correctness metric. The correctness metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-export class Correctness implements Metric
-{
-    name = "CORRECTNESS_SCORE"
+export class Correctness extends Metric implements Metric_interface {
+    name = "CORRECTNESS_SCORE";
 
-    public get_name() : string {
+    // Weights for the correctness components
+    wTCP = 0.3; // Weight of Top Committer Percentage
+    wCP = 0.3;  // Weight of Committer Percentage
+    wNC = 0.4;  // Weight of Number of Committers
+
+    constructor() {
+        super();
+        // You can add code here for any other necessary initialization
+    }
+
+    public score(pkg: Package): number {
+        // Calculate Top Committer Percentage
+        const topCommitterPercentage: number = this.get_top_committer_perc(pkg.get_directory());
+
+        // Calculate Top X Committer Percentage
+        const topXCommitterPercentage: number = this.get_top_x_committer_perc(pkg.get_directory());
+
+        // Calculate Number of Committers
+        const numberOfCommitters: number = this.get_number_committers(pkg.get_directory());
+
+        // Use the provided equation to calculate Correctness Score
+        const k = 0.1; // Function steepness
+        const t = topCommitterPercentage; // Percentage of total commits made by the top contributor
+        const p0 = 5; // Range of top contributors included
+
+        const topCommitterWeight = this.wTCP;
+        const committerPercWeight = this.wCP;
+        const numberCommittersWeight = this.wNC;
+
+        const topCommitterPercFunc = 1 / (1 + Math.exp(-k * t));
+        const topXCommitterPercFunc = 1 / (1 + Math.exp(-k * topXCommitterPercentage));
+        const numberCommittersFunc = 1 / (1 + Math.exp(-k * numberOfCommitters));
+
+        const correctnessScore =
+            (topCommitterWeight * topCommitterPercFunc) +
+            (committerPercWeight * topXCommitterPercFunc) +
+            (numberCommittersWeight * numberCommittersFunc);
+
+        return correctnessScore;
+    }
+
+    public get_name(): string {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
-        return 0;
+    // Implement the following functions based on your provided code
+    private get_top_committer_perc(temp_dir: string): number {
+    
+        return 0; 
+    }
+
+    private get_top_x_committer_perc(temp_dir: string): number {
+
+        return 0; 
+    }
+
+    private get_number_committers(temp_dir: string): number {
+        return 0; 
     }
 }
 
