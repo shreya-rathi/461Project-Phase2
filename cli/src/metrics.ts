@@ -1,12 +1,9 @@
-
-import { exec, ChildProcess } from 'child_process';
+import { execSync } from "child_process";
 import { Package } from './PKG';
 import { commit } from "isomorphic-git";
 import { get } from "http";
-import axios from "axios";
 import { logger } from "./logging/logger";
 import { time } from "console";
-import { GitHub_api_engine } from './api';
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This is the interface for the metrics. It requires each class that implements it to have a 
@@ -19,76 +16,20 @@ export interface Metric {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//The Correctness class calculates a correctness score for a software package or repository.
-// It uses the GitHub API to fetch the counts of open and closed issues and computes a score 
-//as the ratio of closed issues to the total,
-// ensuring it falls between 0 and 1. This score measures code quality and issue resolution, 
-// with higher values indicating better correctness. //
+// This class contains the correctness metric. The correctness metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export class Correctness implements Metric
+{
+    name = "CORRECTNESS_SCORE"
 
-
-export class Correctness implements Metric {
-    public githubApiEngine: GitHub_api_engine;
-
-    constructor() {
-        this.githubApiEngine = new GitHub_api_engine();
+    public get_name() : string {
+        return this.name;
     }
 
-    // Function to get the total number of open issues
-    public async getOpenIssues(owner: string, repo: string): Promise<number> {
-        try {
-            const openIssues = await this.githubApiEngine.getOpenIssues(owner, repo);
-            return openIssues.length;
-        } catch (error) {
-            // Handle errors gracefully
-            console.error('Error fetching open issues:', error);
-            return 0;
-        }
-    }
-
-    // Function to get the total number of closed issues
-    public async getClosedIssues(owner: string, repo: string): Promise<number> {
-        try {
-            const closedIssues = await this.githubApiEngine.getClosedIssues(owner, repo);
-            return closedIssues.length;
-        } catch (error) {
-            // Handle errors gracefully
-            console.error('Error fetching closed issues:', error);
-            return 0;
-        }
-    }
-
-    // Function to calculate correctness score based on issue ratio
-    public async score(pkg: Package): Promise<number> {
-        try {
-
-            const owner = '';
-            const repo = '';
-
-            const totalOpenIssues = await this.getOpenIssues(owner, repo);
-            const totalClosedIssues = await this.getClosedIssues(owner, repo);
-
-            // Calculate the issue ratio
-            const issueRatio = totalClosedIssues / (totalOpenIssues + totalClosedIssues);
-
-            // Ensure issueRatio is between 0 and 1
-            const correctnessScore = Math.min(Math.max(issueRatio, 0), 1);
-
-            // Log the result
-            console.log('Correctness score calculated:', correctnessScore);
-
-            return correctnessScore;
-        } catch (error) {
-            // Handle errors gracefully and return a default value if necessary
-            console.error('Error calculating correctness score:', error);
-            return 0;
-        }
+    public score(pkg: Package) : number {
+        return 0;
     }
 }
-
-
-
-
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This class contains the bus factor metric. The bus factor metric is calculated by using git 
@@ -99,11 +40,11 @@ export class BusFactor implements Metric {
 
     name = "BUS_FACTOR_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         const temp_dir: string = "";
 
         // setting the constants for the bus factor score
@@ -121,9 +62,9 @@ export class BusFactor implements Metric {
         const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
         const top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
         const number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
-        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func)
-            + (top_x_commiter_weight * top_x_commiter_perc_func)
-            + (number_committers_weight * number_committers_func);
+        const bus_factor_score = (top_commiter_weight * top_commiter_perc_func) 
+        + (top_x_commiter_weight * top_x_commiter_perc_func) 
+        + (number_committers_weight * number_committers_func);
         logger.info("bus factor score calculated", {
             msg: "bus factor score calculated",
             module: "BusFactor.prototype.score",
@@ -133,15 +74,15 @@ export class BusFactor implements Metric {
     }
 
     public get_top_committer_perc(temp_dir: string): number {
-
+        
         // switching to the correct directory
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
+            logger.error("could not change directory to temp directory", { 
+                msg: "could not change directory to temp directory", 
+                module: "get_top_commiter_perc", 
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -153,9 +94,9 @@ export class BusFactor implements Metric {
             commit_count = +commit_count_output;
         } catch (error) {
             logger.error("could not retrieve number of commits", {
-                msg: "could not retrieve number of commits",
+                msg: "could not retrieve number of commits", 
                 module: "get_top_commiter_perc",
-                timestamp: new Date()
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -183,10 +124,10 @@ export class BusFactor implements Metric {
         }
         const top_commits = parseInt(first_num[0], 10)
         const top_committer_perc = top_commits / commit_count;
-        logger.info("top committer percentage calculated", {
-            msg: "top committer percentage calculated",
-            module: "get_top_commiter_perc",
-            timestamp: new Date()
+        logger.info("top committer percentage calculated", { 
+            msg: "top committer percentage calculated", 
+            module: "get_top_commiter_perc", 
+            timestamp: new Date() 
         });
         return top_committer_perc;
     }
@@ -197,10 +138,10 @@ export class BusFactor implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
+            logger.error("could not change directory to temp directory", { 
+                msg: "could not change directory to temp directory", 
+                module: "get_top_commiter_perc", 
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -237,7 +178,7 @@ export class BusFactor implements Metric {
                 module: "get_top_x_commiter_perc",
                 timestamp: new Date()
             });
-            return 0;
+            return 0; 
         }
         let x = 5;
         let top_x_commits = 0;
@@ -268,10 +209,10 @@ export class BusFactor implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
+            logger.error("could not change directory to temp directory", { 
+                msg: "could not change directory to temp directory", 
+                module: "get_top_commiter_perc", 
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -303,31 +244,66 @@ export class BusFactor implements Metric {
 // This class contains the license metric. The license metric is calculated by ...
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export class License implements Metric {
-
+    
     name = "LICENSE_SCORE";
 
-    public get_name(): string {
+    public get_name() : string{
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         return 0;
     }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// This class contains the ramp up metric. The ramp up metric is calculated by ...
+// This class contains the ramp up metric. The ramp up metric is calculated by accesing the length 
+// of the readme and the number of files in the repository. 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export class RampUp implements Metric {
 
     name = "RAMP_UP_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
-        return 0;
+    public score(pkg: Package) : number {
+
+        // setting the constants for the ramp up score
+        const function_steepness = 0.1;
+        const readme_length_weight = 0.5;
+        const num_files_weight = 0.5;
+
+        // retrieving the fields needed to calculate the ramp up score
+        const readme_length = this.get_readme_length(pkg);
+        const num_files = this.get_num_files(pkg);
+
+        // calculating the ramp up score
+        const readme_length_func = 1 / (1 + Math.exp(-function_steepness * readme_length));
+        const num_files_func = 1 / (1 + Math.exp(-function_steepness * num_files));
+        const ramp_up_score = (readme_length_weight * readme_length_func) 
+        + (num_files_weight * num_files_func);
+        logger.info("ramp up score calculated", {
+            msg: "ramp up score calculated",
+            module: "RampUp.prototype.score",
+            timestamp: new Date()
+        });
+        return ramp_up_score;
+    }
+
+    public get_readme_length(pkg: Package): number {
+
+        // place api calls here
+
+        return readme_length;
+    }
+
+    public get_num_files(pkg: Package): number {
+
+        // place api calls here
+
+        return num_files;
     }
 }
 
@@ -340,11 +316,11 @@ export class ResponsiveMaintainer implements Metric {
 
     name = "RESPONSIVE_MAINTAINER_SCORE";
 
-    public get_name(): string {
+    public get_name() : string {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number {
         const temp_dir: string = "";
 
         // setting the constants for the responsive maintainer score
@@ -361,8 +337,8 @@ export class ResponsiveMaintainer implements Metric {
         // calculating the responsive maintainer score
         const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
         const commit_frequency_func = 1 / (1 + Math.exp(-function_steepness * commit_frequency));
-        const responsive_maintainer_score = (last_commit_weigth * last_commit_func)
-            + (commit_frequency_weight * commit_frequency_func);
+        const responsive_maintainer_score = (last_commit_weigth * last_commit_func) 
+        + (commit_frequency_weight * commit_frequency_func);
         logger.info("responsive maintainer score calculated", {
             msg: "responsive maintainer score calculated",
             module: "ResponsiveMaintainer.prototype.score",
@@ -377,10 +353,10 @@ export class ResponsiveMaintainer implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
+            logger.error("could not change directory to temp directory", { 
+                msg: "could not change directory to temp directory", 
+                module: "get_top_commiter_perc", 
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -430,10 +406,10 @@ export class ResponsiveMaintainer implements Metric {
         try {
             process.chdir(temp_dir);
         } catch (error) {
-            logger.error("could not change directory to temp directory", {
-                msg: "could not change directory to temp directory",
-                module: "get_top_commiter_perc",
-                timestamp: new Date()
+            logger.error("could not change directory to temp directory", { 
+                msg: "could not change directory to temp directory", 
+                module: "get_top_commiter_perc", 
+                timestamp: new Date() 
             });
             return 0;
         }
@@ -476,7 +452,7 @@ export class NetScore implements Metric {
         return this.name;
     }
 
-    public score(pkg: Package): number {
+    public score(pkg: Package) : number{
         const temp_dir = "";
         const url = ""
 
@@ -493,14 +469,14 @@ export class NetScore implements Metric {
         const correctness_weight = 0.2;
         const ramp_up_weight = 0.2;
         const license_weight = 0.2;
-
+        
         // calculating the net score
-        const net_score = Math.floor((bus_factor_weight * bus_factor_score)
-            + (responsive_maintainer_weight * responsive_maintainer_score)
-            + (correctness_weight * correctness_score)
-            + (ramp_up_weight * ramp_up_score)
+        const net_score = Math.floor((bus_factor_weight * bus_factor_score) 
+            + (responsive_maintainer_weight * responsive_maintainer_score) 
+            + (correctness_weight * correctness_score) 
+            + (ramp_up_weight * ramp_up_score) 
             + (license_weight * license_score));
-
+        
         // formatting the net score as ndjson and printing it to stdout
         const score_json = [{
             "URL": url,
@@ -511,7 +487,7 @@ export class NetScore implements Metric {
             "RESPONSIVE_MAINTAINER_SCORE": responsive_maintainer_score,
             "LICENSE_SCORE": license_score
         }];
-
+        
         const ndjson_output = score_json.map((obj) => {
             return JSON.stringify(obj);
         }).join('\n');
