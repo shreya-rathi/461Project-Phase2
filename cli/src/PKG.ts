@@ -16,9 +16,9 @@ export class Package {
     public type: string; 
     public owner: string; 
     public repo: string;
-   
 
     //metrics
+    public temp_dir: string = '';
 
     //license
     public LicenseScore: number = 0;
@@ -71,7 +71,7 @@ export class Package {
 
 
         if (this.type == "github") {
-            this.Clone_Repo(this.owner, this.repo);
+            const temp_dir = this.Clone_Repo(this.owner, this.repo);
         }else if (this.type == "npm") {
             this.Npm_Handler(this.repo);
         }else {
@@ -82,7 +82,7 @@ export class Package {
     }
 
 
-    private Clone_Repo(owner: string, repo: string): string {
+    public Clone_Repo(owner: string, repo: string): string {
         //potentially put in constructor
         // put cloning here
         const temp_dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-temp-dir'));
@@ -101,7 +101,7 @@ export class Package {
         return temp_dir
     }
 
-    private Delete_Repo(temp_dir: string) {
+    public Delete_Repo(temp_dir: string) {
       //Log deleting repository
       logger.info("Deleting local repository", {timestamp: new Date()});
       fs.rmdirSync(temp_dir, { recursive: true });

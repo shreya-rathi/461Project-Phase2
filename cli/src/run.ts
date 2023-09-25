@@ -6,7 +6,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 import { Command } from "commander";
-import { Package } from "./PKG";
+import { Package, Clone_Repo, Delete_Repo } from "./PKG";
 import { installCommand } from './commands/install';
 import { testCommand } from './commands/test';
 import { readFileSync } from "fs";
@@ -45,7 +45,7 @@ export function CLI() {
                 urls.forEach(url => { 
                     const pckg = new Package(url, "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");
                     packages.push(pckg);
-                })
+                })            
 
                 packages.forEach(pckg => {
                     /*
@@ -55,6 +55,11 @@ export function CLI() {
                     const ramp_up_score = new RampUp();
                     const responsiveness_score = new ResponsiveMaintainer();
                     */
+                    
+                    // cloning the repo and adding the temporary directory name to the package object
+                    const temp_dir = Clone_Repo(pckg.owner, pckg.repo);
+                    pckg.temp_dir = temp_dir;
+
                     const net_score = new NetScore();
                     /*
                     pckg.CorrectnessScore = correctness_score.score(pckg);
@@ -64,6 +69,10 @@ export function CLI() {
                     pckg.MaintenanceScore = responsiveness_score.score(pckg);
                     */
                     pckg.Netscore = net_score.score(pckg);
+
+
+                    // deleting the temporary directory
+                    Delete_Repo(pckg.temp_dir);
                 })
 
                 // print out the metrics for each package
