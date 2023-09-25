@@ -1,15 +1,21 @@
-
-
 # Main pipeline
-* Diagram
+* [Pipeline](https://lucid.app/lucidchart/6ac65f58-b4cb-483f-9bce-8f949223347e/edit?viewport_loc=104%2C-115%2C1931%2C1131%2C0_0&invitationId=inv_59f19485-31c5-4574-ba81-0903edaed925)
   
 # Helper Classes
 ## Package
+* Created to represent the packages to be evaluated ans scored.
+* Holds useful information such as packge name, owner, repo location, etc.
 
+### Constructor
+* Creation of a package is simple and can be done with just a url
+```typescript
+import { Package } from "./PKG";
 
-### Description
-### Examples
-### 
+let pkg = new Package("https://www.npmjs.com/package/safe-regex");
+```
+
+* Inside of the constructor, the url is parsed and needed information is stored in the object.
+
 
 # Commands
 * The CLI commands are implemented using a module called 'commander'.
@@ -32,29 +38,49 @@
 ## Pipelines
 
 ### ./run install
-* Diagram
-* 
+* Install dependencies
+* [Pipeline](https://lucid.app/lucidchart/60603e27-1000-4fde-86d7-63de5030052c/edit?viewport_loc=192%2C226%2C1758%2C1029%2C0_0&invitationId=inv_4baa540d-4ab1-49cd-a42c-829a2ebb3d7d) 
+  
 ### ./run URL_FILE
-* Diagram
+* Score packages from urls in provided file
+* [Pipeline](https://lucid.app/lucidchart/6f345baf-decc-4c3d-a9ac-d18beed376ce/edit?invitationId=inv_286a5e09-8e48-4c5a-b945-7fee69e5c01b)
 
 ### ./run test
-* Diagram
+* Conduct test suite and output results
+* [Pipeline](https://lucid.app/lucidchart/f9e8e454-c43d-437d-8afe-117b59ffd18f/edit?viewport_loc=89%2C39%2C1593%2C933%2C0_0&invitationId=inv_2ccb512b-07bb-4d8a-8b5d-7089f1cea216)
 
 # Metrics
 
 ## Bus Factor
 ### Description
-* 
+* Bus factor is a measurement of the spread of maintentance across different contributers.
+  
 ### How we plan on measuring this
 * To calculate the bus factor of a module, we will clone the repository and access the git metadata. 
 * We will clone only the required files in order to minimize storage. 
 * We will access the git log (one method might be using the git shortlog command), and look at the top contributors of the repository, and what percent each of them has contributed, as well as total number of contributors.
-* 
+  
 ### Formula
+* The code for the calculation
+* ```typescript
+  const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
+  const top_x_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_x_commiter_perc - 0.5)));
+  const number_committers_func = 1 / (1 + Math.exp(-func_steepness * number_committers));
+  const bus_factor_score = (top_commiter_weight * top_commiter_perc_func)
+      + (top_x_commiter_weight * top_x_commiter_perc_func)
+      + (number_committers_weight * number_committers_func);
+  ```
 
 ## Correctness
 ### Description
+* Our package manager should support packages with a high standard of correctness. Minimal errors, open issues, etc.
+  
 ### How we plan on measuring this
+* Looking at open issues we can get a good idea of the level of correctness of the desired package.
+ * Current open issues
+ * Average issues per month over the last year
+ * Number of closed issues over time.
+   
 ### Formula
 
 ## License
@@ -78,6 +104,7 @@
 * We believe a good indicator for this metric is how detailed the documentation is and how much it covers.
 
 ### Formula
+ 
 
 ## Responsive Maintainer
 ### Description
@@ -87,7 +114,13 @@
 * Checking committer activity we believe is a good way to determine how active the maintenance is on the package.
 * 
 ### Formula
-
+* ```typescript
+    const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
+    const commit_frequency_func = 1 / (1 + Math.exp(-function_steepness * commit_frequency));
+    const responsive_maintainer_score = (last_commit_weigth * last_commit_func)
+        + (commit_frequency_weight * commit_frequency_func);
+   ```
+  
 ## Net Score
 ### Description
 * This is a representation of the overall score of a package, according to the provided metrics.
@@ -96,8 +129,8 @@
 * This will be mostly a weighted sum of the scores, normalized to be between 0 and 1.
 
 ### Formula
-* $L_sc = License Score
-* $max(0,L_sc) * (weighted sum)
+* L_sc = License Score
+* max(0,L_sc) * (weighted sum)
 
 # Logging
 * Logging is implemented through a convenient library, called 'pino'.
@@ -110,11 +143,10 @@
    ```
  * The options parameter can take many useful keys depending on what you want.
  * We use the following inside options:
-  * levels:
-  * formatters:
-  * transports: 
+  * level:
+    * This is a string specifying the lowest level to be logged.
+    * This is determined by the environment variable LOG_LEVEL
  * The destination parameter at least must contain a ```.write()``` method.
-* Our logger is configured to separate logs by level in /cli/src/logging/logs
   
 # Tests
 * Unit tests are implemented through a library called 'jest'.
@@ -145,16 +177,32 @@
 * We use the GitHub REST API for the following cases:
  * Getting the top number of committers
 
+### Uses
+* Getting data on issues
+  * Current number opened
+  * Number of closed issues
+  * Accessing Readme file and License file
 ## Terminal commands
 
 ### Getting the top committers % of total commits
-* We implement this by ...
-
+* ```Busfactor.get_top_committer_perc();```
+* Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
+ *  For
+* Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
+ *  For
+ *  
 ### Getting the top x committers % of total commits
-* We implement this by ...
+* ```Busfactor.get_top__x_committer_perc();```
+* * Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
+ *  For
+* Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
+ *  For
+
 
 ### Getting the number of committers
-* We implement this by ...
+* ```Busfactor.get_number_committers();```
+* Executes ```execSync(`git log --format='%ae' | sort -u | wc -l`);```
+ *  For
 
 # npm
 
@@ -164,8 +212,10 @@
 * REST API: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 
 ## npm install
+* We use this command only to install the needed dependencies inside of ```./run install```
 
 ### Possible Errors
+* List of possible errors when using npm install
 
 * Missing package.json file:
   * npm requires a package.json file in the project directory to resolve and install dependencies. If this file is missing, you will get an error.

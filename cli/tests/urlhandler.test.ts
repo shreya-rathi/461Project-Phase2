@@ -1,8 +1,8 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Version: 1.0
-// Date: 09/07/2023
-// Author: Ethan Burmane
-// Description: File to handle url input from command line
+// Date: 09/22/2023
+// Author: Ashwin Sreedhar
+// Description: Tests for URLHandler
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 import { url_handler, github_handler, npm_handler } from '../src/url_handler';  // Adjust the import path according to your project structure

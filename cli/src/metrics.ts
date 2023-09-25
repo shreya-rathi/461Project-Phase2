@@ -1,10 +1,10 @@
+import { Package_Installer } from "./installer";
 import { execSync } from "child_process";
 import { Package } from './PKG';
 import { commit } from "isomorphic-git";
 import { get } from "http";
 import { logger } from "./logging/logger";
 import { time } from "console";
-import { Package_Installer } from "./installer";
 import axios from "axios";
 import * as nodegit from "nodegit";
 import * as fs from "fs";
@@ -17,7 +17,7 @@ import * as path from "path";
 export interface Metric {
     name: string;
     get_name(): string;
-    score(pkg: Package): number;
+    score(pkg: Package): any;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -163,6 +163,7 @@ export class BusFactor implements Metric {
             });
             return 0;
         }
+        
         // retreiving the number of commits from the top x committers and calculating the percentage
         let commit_list_output: string;
         try {
@@ -255,8 +256,177 @@ export class License implements Metric {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
-        return 0;
+    public async score(pkg: Package) : Promise<number> {
+        const Lscore = await this.License(pkg);
+        return (Lscore);
+    }
+
+    private FindMatch(fileContents: string): string[] {
+        const licensePatterns: string[] = [
+          'LGPLv2[. ]1',
+          'GPLv2',
+          'GPLv3',
+          'MIT',
+          'BSD',
+          'Apache',
+          'Expat',
+          'zlib',
+          'ISC',
+        ];
+        
+      
+        // Create a set to store found licenses
+        const foundLicenses: Set<string> = new Set<string>();
+      
+        // Generate regex patterns for each license
+        const regexPatterns: RegExp[] = licensePatterns.map((pattern) => {
+          // Escape any special characters in the pattern
+          const escapedPattern = pattern.replace(/[.*+?^${}()-|[\]\\]/g, '\\$&');
+          return new RegExp(`[^\\w\\d]${escapedPattern}[^\\w\\d]`, 'i');
+        });
+      
+        // Find matches using the generated regex patterns
+        for (const regex of regexPatterns) {
+          const matches = fileContents.match(regex);
+          if (matches) {
+            for (const match of matches) {
+              // Clean up the match by removing surrounding non-alphanumeric characters
+              const cleanedMatch = match.replace(/[^a-zA-Z0-9]+/g, '');
+              //console.log('Pattern Matched:', match);
+              foundLicenses.add(cleanedMatch);
+            }
+          }
+        }
+      
+        // Convert the set to an array and return it
+        return Array.from(foundLicenses);
+      }
+  
+      private async CloneReadme(url: string, GIT_TOKEN: string) {
+          try {
+            // Get the README file content from the GitHub API.
+            logger.info("Requesting readme from github", {timestamp: new Date(), url: url});
+            const response = await axios.get(url, {
+              headers: {
+                Authorization: `token ${GIT_TOKEN}`,
+                Accept: 'application/vnd.github.VERSION.raw', // Use the raw content type
+              },
+            });
+        
+            // Return the README file content as a string.
+            return response.data;
+          } catch (error: any) {
+                if (error.response)
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), url: url, message: error.message, response: error.response.data});
+                    throw new Error(error.response.data);
+                }
+                else
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), url: url, message: error.message});
+                    throw new Error(error.message);
+                }
+          }
+      }
+  
+      private async fetchNpmPackageReadme(packageName: string) {
+          try {
+            // Get the package  content
+            logger.info("Getting readme from npm", {timestamp: new Date(), package: packageName});
+            const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+            const packageData = response.data;
+        
+            // Check if the package data contains a README field.
+            if (packageData.readme) {
+                
+              logger.info("Found readme from npm", {timestampe: new Date(), package: packageName});
+              //console.log(packageData.readme);
+              return packageData.readme;
+            } else {
+              logger.error("Readme not found on npm", {timestamp: new Date(), package: packageName, response
+              throw new Error(`README not found for package: ${packageName}`);
+            }
+          } catch (error: any) {
+                if (error.response)
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), package: packageName, message: error.message, response: error.response.data});
+                }
+                else
+                {
+                    logger.error("Error encountered when requesting readme", {timestamp: new Date(), package: packageName, message: error.message});
+                }
+                throw new Error(error.response ? error.response.data : error.message);
+          }
+        }
+  
+        private async  fetchNpmLicense(packageName: string) {
+          try {
+            // Get the package content
+            const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+            const packageData = response.data;
+        
+            // Check if the package data contains a license field.
+            if (packageData.license) {
+              console.log('license file found for package:', packageName);
+              //console.log(packageData.readme);
+              return packageData.license;
+            } else {
+              throw new Error(`License file not found for package: ${packageName}`);
+            }
+          } catch (error: any) {
+            throw new Error(error.response ? error.response.data : error.message);
+          }
+        }
+  
+      public async License(pkg: Package): Promise<number> {
+        //loading package information
+        let type: string = pkg.type;
+        let owner: string = pkg.owner;
+        let repo: string = pkg.repo;
+        let GIT_TOKEN  = pkg.githubToken;
+        //defiing variables
+        let UrlRepo: string = ''; 
+        let readmeContent: string = '';
+        let LContent: string = '';
+
+        //checking if the type is github or npm and calling the appropriate function
+        if (type == "github.com") {  
+          //formating the url for the github api
+          UrlRepo = `https://github.com/${owner}/${repo}`;
+          readmeContent = await this.CloneReadme(UrlRepo, GIT_TOKEN);
+          console.log(UrlRepo);
+        }else if (type == "npmjs.com") {
+          console.log("NPM called");
+          //npm version is called with repo name, url is made in function
+          readmeContent = await this.fetchNpmPackageReadme(repo)
+          //many npm repos dont put the license in the readme but in a seperate file
+          LContent = await this.fetchNpmLicense(repo);
+          console.log(UrlRepo);
+        }
+        else {
+          console.log("Invalid URL");
+          pkg.LicenseName = "Invalid URL";
+          pkg.LicenseScore = 0;
+        }
+        
+        //call the find match function to find the license match
+        const RD_Match = this.FindMatch(readmeContent);
+        
+        //check if the license was found in the readme
+        if (RD_Match && RD_Match.length > 0) {
+          pkg.LicenseName = RD_Match[0];
+          pkg.LicenseScore = 1;
+          }
+          else {
+            //if the license was not found in the readme check if it was found in the license file
+              const L_Match = this.FindMatch(LContent);
+              if (L_Match && L_Match.length > 0) {
+                  console.log('License found: ' + L_Match[0]);
+                  pkg.LicenseName = L_Match[0];
+                  pkg.LicenseScore = 1;
+              }
+          }
+        return pkg.LicenseScore
     }
 }
 

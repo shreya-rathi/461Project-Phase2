@@ -70,6 +70,7 @@ export function CLI() {
                     */
                     pckg.Netscore = net_score.score(pckg);
 
+
                     // deleting the temporary directory
                     Delete_Repo(pckg.temp_dir);
                 })
