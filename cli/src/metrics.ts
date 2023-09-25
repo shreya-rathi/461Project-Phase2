@@ -45,7 +45,6 @@ export class BusFactor implements Metric {
     }
 
     public score(pkg: Package) : number {
-        const temp_dir: string = "";
 
         // setting the constants for the bus factor score
         const func_steepness = 0.1;
@@ -54,9 +53,9 @@ export class BusFactor implements Metric {
         const number_committers_weight = 0.4;
 
         // retreiving the fields needed to calculate the bus factor score
-        const top_commiter_perc = this.get_top_committer_perc(temp_dir);
-        const top_x_commiter_perc = this.get_top_x_committer_perc(temp_dir);
-        const number_committers = this.get_number_committers(temp_dir);
+        const top_commiter_perc = this.get_top_committer_perc(pkg.temp_dir);
+        const top_x_commiter_perc = this.get_top_x_committer_perc(pkg.temp_dir);
+        const number_committers = this.get_number_committers(pkg.temp_dir);
 
         // calculating the bus factor score
         const top_commiter_perc_func = 1 / (1 + Math.exp(-func_steepness * (top_commiter_perc - 0.5)));
@@ -321,7 +320,6 @@ export class ResponsiveMaintainer implements Metric {
     }
 
     public score(pkg: Package) : number {
-        const temp_dir: string = "";
 
         // setting the constants for the responsive maintainer score
         const function_steepness = 0.1;
@@ -331,8 +329,8 @@ export class ResponsiveMaintainer implements Metric {
         const commit_frequency_weight = 0.5;
 
         // retrieving the fields needed to calculate the responsive maintainer score
-        const last_commit = this.get_last_commit(temp_dir);
-        const commit_frequency = this.get_commit_frequency(temp_dir);
+        const last_commit = this.get_last_commit(pkg.temp_dir);
+        const commit_frequency = this.get_commit_frequency(pkg.temp_dir);
 
         // calculating the responsive maintainer score
         const last_commit_func = 1 / (1 + Math.exp(-function_steepness * (last_commit - sigmoid_midpoint)));
@@ -453,8 +451,6 @@ export class NetScore implements Metric {
     }
 
     public score(pkg: Package) : number{
-        const temp_dir = "";
-        const url = ""
 
         // retrieving the scores for each metric
         const bus_factor_score = Math.floor(BusFactor.prototype.score(pkg));
@@ -479,7 +475,7 @@ export class NetScore implements Metric {
         
         // formatting the net score as ndjson and printing it to stdout
         const score_json = [{
-            "URL": url,
+            "URL": pkg.url,
             "NET_SCORE": net_score,
             "RAMP_UP_SCORE": ramp_up_score,
             "CORRECTNESS_SCORE": correctness_score,
