@@ -4,6 +4,11 @@ import { commit } from "isomorphic-git";
 import { get } from "http";
 import { logger } from "./logging/logger";
 import { time } from "console";
+import { Package_Installer } from "./installer";
+import axios from "axios";
+import * as nodegit from "nodegit";
+import * as fs from "fs";
+import * as path from "path";
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // This is the interface for the metrics. It requires each class that implements it to have a 
