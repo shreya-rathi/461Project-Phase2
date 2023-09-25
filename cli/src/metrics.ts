@@ -302,9 +302,166 @@ export class RampUp implements Metric {
         return this.name;
     }
 
-    public score(pkg: Package) : number {
-        return 0;
+    //caluclates the ramp up score
+    async score(pkg: Package) : Promise<number> {
+
+        // setting the constants for the ramp up score
+        const function_steepness = 0.1;
+        const readme_length_weight = 0.5;
+        const num_files_weight = 0.5;
+    
+        // retrieving the fields needed to calculate the ramp up score
+        
+        const readme_length = await this.get_readme_length(pkg); 
+        const num_files = await this.get_num_files(pkg);
+        
+    
+        // calculating the ramp up score
+        const readme_length_func = 1 / (1 + Math.exp(-function_steepness * Number(readme_length)));
+        const num_files_func = 1 / (1 + Math.exp(-function_steepness * Number( num_files)));
+        const ramp_up_score = (readme_length_weight * readme_length_func) 
+        + (num_files_weight * num_files_func);
+        logger.info("ramp up score calculated", {
+            msg: "ramp up score calculated",
+            module: "RampUp.prototype.score",
+            timestamp: new Date()
+        });
+        return ramp_up_score;
     }
+
+    //uses method to get the readme from github
+    async CloneReadme(url: string, GIT_TOKEN: string) {
+        try {
+          // Get the README file content from the GitHub API.
+          const response = await axios.get(url, {
+            headers: {
+              Authorization: `token ${GIT_TOKEN}`,
+              Accept: 'application/vnd.github.VERSION.raw', // Use the raw content type
+            },
+          });
+      
+          // Return the README file content as a string.
+          return response.data;
+        } catch (error: any) {
+          throw new Error(error.response ? error.response.data : error.message);
+        }
+    }
+
+    //uses method to get the readme from npm
+    async fetchNpmPackageReadme(packageName: string) {
+        try {
+          // Get the package  content
+          const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+          const packageData = response.data;
+      
+          // Check if the package data contains a README field.
+          if (packageData.readme) {
+            console.log('README found for package:', packageName);
+            //console.log(packageData.readme);
+            return packageData.readme;
+          } else {
+            throw new Error(`README not found for package: ${packageName}`);
+          }
+        } catch (error: any) {
+          throw new Error(error.response ? error.response.data : error.message);
+        }
+      }
+    //gets the readme lenght
+    async  get_readme_length(pkg: Package) {
+        let UrlRepo: string = '';
+        const owner = pkg.owner;
+        const repo = pkg.repo;
+        const url = pkg.url;
+        const GIT_TOKEN = pkg.githubToken;
+        let readmeContent: string = '';
+    
+        if (pkg.type == "github.com") {  
+            UrlRepo =`https://github.com/${owner}/${repo}`
+            readmeContent = await this.CloneReadme(UrlRepo, GIT_TOKEN); 
+            console.log(UrlRepo);
+          }else if (pkg.type == "npmjs.com") {
+            UrlRepo = `https://registry.npmjs.org/${repo}`;
+            readmeContent = await this.fetchNpmPackageReadme(repo)
+            console.log(UrlRepo);
+          }
+          else {
+            console.log("Invalid URL");
+          }
+        
+        console.log('Readme Length', readmeContent.length);
+        return readmeContent.length;
+    
+    }
+    
+    //clones repo and counts the number of files in the repo
+    async  get_num_files(pkg: Package) {
+        let UrlRepo = pkg.url;
+        if (pkg.type !== 'unknown') {
+            const repoPath = path.join(__dirname, 'clone'); // Specify the directory where you want to clone the repository
+          
+            try {
+              const files = fs.readdirSync(repoPath);
+          
+              // Check if the directory is not empty
+              if (files.length > 0) {
+                // Clear the directory by removing all files and subdirectories
+                for (const file of files) {
+                  const filePath = path.join(repoPath, file);
+                  const stat = fs.statSync(filePath);
+          
+                  if (stat.isDirectory()) {
+                    // Remove subdirectories and their contents
+                    fs.rmSync(filePath, { recursive: true });
+                  } else {
+                    // Remove files
+                    fs.unlinkSync(filePath);
+                  }
+                }
+              }
+          
+              // Clone the repository
+              await execSync(`git clone ${UrlRepo} ${repoPath}`);
+    
+              //report the number of files in the directory
+              
+            } catch (error : any) {
+              console.error(`An error occurred: ${error.message}`);
+            }
+           
+            const fileCount = this.countFilesInDirectory(repoPath);
+            console.log("fileCount", fileCount);
+            return fileCount;
+          }
+        
+      
+        
+        }
+    
+          
+    
+        //recursive function to count the number of files in a directory
+        countFilesInDirectory(dirPath: string) {
+            let fileCount = 0;
+          
+            // Read the contents of the directory
+            const contents = fs.readdirSync(dirPath);
+          
+            contents.forEach((item) => {
+              const itemPath = path.join(dirPath, item);
+          
+              // Check if it's a directory
+              if (fs.statSync(itemPath).isDirectory()) {
+                // If it's a directory, recursively count files in it
+                fileCount += this.countFilesInDirectory(itemPath);
+              } else {
+                // If it's a file, increment the file count
+                fileCount++;
+              }
+            });
+          
+            return fileCount;
+          }
+
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
