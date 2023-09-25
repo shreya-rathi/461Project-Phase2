@@ -4,8 +4,8 @@ import subprocess
 import sys
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: ./run <argument>")
+    if len(sys.argv) != 2:
+        print("Enter a command: ./run <command>")
         sys.exit(1)
     
     argument = sys.argv[1]
@@ -14,7 +14,7 @@ def main():
     try:
         subprocess.run(command, check=True)
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
+        print(f"Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

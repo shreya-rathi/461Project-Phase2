@@ -14,7 +14,7 @@ import { Package } from "../src/PKG";
 describe("Correctness", () => {
     it("is expected to return the Correctness score", async () => {
         const correctness_score = new Correctness();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await correctness_score.score(pckg); 
         expect(score).toBeDefined(); // checks that score is not null
         expect(correctness_score.name).toBe("CORRECTNESS_SCORE"); // maybe changed to correctness_score.get_name(), to use the function
@@ -25,7 +25,7 @@ describe("Correctness", () => {
 describe("BusFactor", () => {
     it("is expected to return the Bus Factor score", async () => {
         const bus_factor_score = new BusFactor();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await bus_factor_score.score(pckg); 
         expect(score).toBeDefined(); 
         expect(bus_factor_score.name).toBe("BUS_FACTOR_SCORE");
@@ -36,7 +36,7 @@ describe("BusFactor", () => {
 describe("LicenseCompatibility", () => {
     it("is expected to return the License Compatibility score", async () => {
         const license_score = new License();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await license_score.score(pckg);
         expect(score).toBeDefined();
         expect(license_score.name).toBe("LICENSE_SCORE");
@@ -47,7 +47,7 @@ describe("LicenseCompatibility", () => {
 describe("Ramp-Up", () => {
     it("is expected to return the Ramp-Up Time score", async () => {
         const ramp_up_score = new RampUp();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await ramp_up_score.score(pckg);
         expect(score).toBeDefined();
         expect(ramp_up_score.name).toBe("RAMP_UP_SCORE");
@@ -58,7 +58,7 @@ describe("Ramp-Up", () => {
 describe("Responsiveness", () => {
     it("is expected to return the Responsiveness score", async () => {
         const responsiveness_score = new ResponsiveMaintainer();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await responsiveness_score.score(pckg);
         expect(score).toBeDefined();
         expect(responsiveness_score.name).toBe("RESPONSIVE_MAINTAINER_SCORE");
@@ -70,7 +70,7 @@ describe("Responsiveness", () => {
 describe("NetScore", () => {
     it("is expected to return the Net Score calculation score", async () => {
         const net_score = new NetScore();
-        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
+        const pckg = new Package("https://www.npmjs.com/package/karma", "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");
         const score = await net_score.score(pckg);
         expect(score).toBeDefined();
         expect(net_score.name).toBe("NET_SCORE");

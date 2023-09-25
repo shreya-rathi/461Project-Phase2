@@ -1,3 +1,10 @@
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Version: 1.2
+// Date: 09/23/2023
+// Author: Ashwin Sreedhar
+// Description: CLI command for installing dependencies
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 import { Command } from "commander";
 import { Package } from "./PKG";
 import { installCommand } from './commands/install';
@@ -7,8 +14,8 @@ import { NetScore } from "./metrics";
 
 export function CLI() {
     const program = new Command();
-    const figlet = require("figlet");
-    console.log(figlet.textSync("Package Management Rating System"));
+    //const figlet = require("figlet");
+    //onsole.log(figlet.textSync("Package Management Rating System"));
 
     program
         .version("0.0.1")
@@ -20,6 +27,7 @@ export function CLI() {
         .arguments('<filePath>')
         .description("Parses a file of URLs and return the metrics for each URL")
         .action(async(filePath: string) => {
+            /*
             type metrics = {
                 NET_SCORE: number,
                 LICENSE_SCORE: number,
@@ -27,7 +35,7 @@ export function CLI() {
                 RAMP_UP_SCORE: number,
                 RESPONSIVE_MAINTAINER_SCORE: number,
                 BUS_FACTOR_SCORE: number
-            }
+            }*/
             try {
                 const fileContent = readFileSync("filePath", "utf-8");
                 const urls = fileContent.split("\n").map(url => url.trim()).filter(url => url.length > 0);
@@ -35,7 +43,7 @@ export function CLI() {
                 let packages: Package[] = [];
 
                 urls.forEach(url => { 
-                    const pckg = new Package(url, "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");
+                    const pckg = new Package(url, "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");
                     packages.push(pckg);
                 })
 
