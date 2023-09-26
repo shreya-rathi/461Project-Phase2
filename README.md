@@ -182,27 +182,23 @@ let pkg = new Package("https://www.npmjs.com/package/safe-regex");
   * Current number opened
   * Number of closed issues
   * Accessing Readme file and License file
+    
 ## Terminal commands
+* Documentation https://git-scm.com/docs/git 
 
 ### Getting the top committers % of total commits
 * ```Busfactor.get_top_committer_perc();```
 * Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
- *  For
 * Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
- *  For
- *  
 ### Getting the top x committers % of total commits
 * ```Busfactor.get_top__x_committer_perc();```
-* * Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
- *  For
+* Executes ```execSync(`git rev-list --count --all`, { encoding: 'utf-8' });```
 * Executes ```execSync('git shortlog -s -n', { encoding: 'utf-8' });```
- *  For
 
 
 ### Getting the number of committers
 * ```Busfactor.get_number_committers();```
 * Executes ```execSync(`git log --format='%ae' | sort -u | wc -l`);```
- *  For
 
 # npm
 
